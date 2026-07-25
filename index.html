@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>! KanK - Servidor Discord</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background-color: #0a0a0a; color: #f0f0f0; font-family: sans-serif; min-height: 100vh; }
+
+header {
+display: flex; justify-content: space-between; align-items: center;
+padding: 15px 20px; background-color: #111;
+position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #222;
+}
+.logo {
+color: #ff3385; font-size: 32px;
+font-family: 'Permanent Marker', cursive;
+letter-spacing: 1px;
+}
+.hamburguer { font-size: 30px; color: #ff3385; cursor: pointer; user-select: none; }
+.menu {
+display: none; position: absolute; top: 60px; right: 20px;
+background-color: #111; border: 1px solid #ff3385;
+border-radius: 8px; width: 220px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+.menu.aberto { display: block; }
+.menu a {
+display: block; padding: 12px; color: #f0f0f0;
+text-decoration: none; border-bottom: 1px solid #222; cursor: pointer;
+}
+.menu a:hover { background-color: #ff3385; color: #000; }
+
+.item-restrito { display: none; }
+
+.titulo {
+color: #ff3385; margin: 20px 0 10px; font-size: 24px;
+font-family: 'Permanent Marker', cursive;
+}
+.conteudo { padding: 20px; max-width: 900px; margin: 0 auto; position: relative; }
+.texto { line-height: 1.6; margin-bottom: 15px; }
+
+/* Banner de Entrada com o nome banner1.jpg */
+.banner-inicio {
+width: 100%;
+max-height: 380px;
+object-fit: cover;
+border-radius: 8px;
+border: 1px solid #ff3385;
+margin-bottom: 20px;
+box-shadow: 0 0 15px rgba(255, 51, 133, 0.2);
+}
+
+.botao {
+display: inline-block; padding: 12px 30px;
+background-color: transparent; border: 2px solid #ff3385;
+color: #ff3385; text-decoration: none; border-radius: 50px;
+font-weight: bold; margin: 10px 5px 10px 0; transition: all 0.3s; cursor: pointer;
+text-align: center;
+}
+.botao:hover { background-color: #ff3385; color: #000; }
+
+.navegacao-ranking { display: flex; gap: 10px; margin-bottom: 20px; }
+.btn-ranking { flex: 1; border-radius: 8px; padding: 12px; background: #111; color: #ff3385; border: 1px solid #ff3385; font-weight: bold; cursor: pointer; font-size: 16px; letter-spacing: 1px; }
+.btn-ranking.ativo { background-color: #ff3385; color: #000; }
+
+.item-ranking { margin: 12px 0; padding: 12px; border-left: 3px solid #ff3385; display:flex; align-items:center; gap:10px; background:#111; border-radius:6px; justify-content: space-between; }
+.posicao { font-size:22px; font-weight:bold; color:#ff3385; min-width:30px; text-align:center; }
+.ranking-nome { color: #ff3385; font-size: 18px; font-weight: bold; }
+.ranking-tag { color:#aaa; font-size:14px; margin:2px 0; }
+.ranking-info { color:#fff; font-size:15px; }
+
+.pagina { display: none; }
+.ativa { display: block; }
+
+.caixa-login {
+max-width: 380px; margin: 30px auto; padding: 25px;
+border: 1px solid #ff3385; border-radius: 8px; background-color: #111;
+}
+.grupo-senha { position: relative; }
+input[type="text"], input[type="password"], input[type="color"], input[type="file"] {
+width: 100%; padding: 10px; margin: 8px 0;
+background-color: #222; border: 1px solid #ff3385;
+color: #fff; border-radius: 4px; font-size: 15px; outline: none;
+}
+input[type="color"] { height: 45px; cursor: pointer; }
+
+.btn-olho {
+position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+background:transparent; border:none; color:#ff3385; font-size:18px; cursor:pointer;
+}
+button:not(.btn-olho):not(.btn-ranking) {
+padding: 10px 20px; background-color: #ff3385; color: #000;
+border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 8px;
+}
+.erro { color: #ff3385; margin-top: 10px; display: none; }
+
+.admin-item, .item-cargo {
+user-select: text;
+-webkit-user-select: text;
+margin: 15px 0; padding: 15px; border-left: 3px solid #ff3385;
+display:flex; align-items:center; justify-content:space-between; background:#111; border-radius:6px;
+}
+.admin-nome, .cargo-nome { font-size: 20px; font-weight: bold; margin-bottom: 3px; display:flex; align-items:center; gap:8px; }
+.badge-cor { width: 14px; height: 14px; border-radius: 50%; display: inline-block; border: 1px solid #fff; flex-shrink: 0; }
+.admin-tag, .cargo-tag { color:#aaa; font-size:15px; margin-bottom:5px; }
+
+.img-cargo-preview { max-width: 80px; max-height: 80px; border-radius: 6px; object-fit: cover; border: 1px solid #ff3385; margin-top: 5px; }
+
+.acao-item { display:flex; gap:8px; flex-shrink:0; }
+.btn-lapis, .btn-lixeira {
+background:transparent; border:1px solid #ff3385; color:#ff3385;
+padding:6px 10px; border-radius:4px; cursor:pointer; font-size:16px;
+}
+.btn-lapis:hover, .btn-lixeira:hover { background:#ff3385; color:#000; }
+.btn-adicionar {
+display:none; margin-top:20px; width:100%; border:2px dashed #ff3385;
+background:transparent; color:#ff3385; font-size:18px; padding:12px;
+border-radius:8px; cursor:pointer;
+}
+.btn-adicionar:hover { background:#ff3385; color:#000; }
+
+.grade-armazenamento { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; margin-top: 20px; }
+.card-midia { background: #111; border: 1px solid #ff3385; border-radius: 8px; padding: 10px; text-align: center; position: relative; }
+.card-midia img, .card-midia video { width: 100%; height: 140px; object-fit: cover; border-radius: 6px; }
+.btn-excluir-midia { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.8); color: #ff3385; border: 1px solid #ff3385; border-radius: 50%; width: 26px; height: 26px; cursor: pointer; font-weight: bold; }
+
+.modal-editar {
+display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+background:#111; border:2px solid #ff3385; border-radius:8px;
+padding:20px; width:90%; max-width:450px; z-index:999;
+box-shadow: 0 0 20px rgba(255, 51, 133, 0.3);
+}
+.fundo-modal {
+display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+background:rgba(0,0,0,0.85); z-index:998; backdrop-filter: blur(3px);
+}
+.btn-cancelar { background:#222; border:1px solid #ff3385; color:#ff3385; }
+
+.checkbox-container { margin: 10px 0; display: flex; flex-direction: column; gap: 8px; }
+.checkbox-item { display: flex; align-items: center; gap: 8px; color: #ccc; cursor: pointer; }
+.checkbox-item input { width: auto; margin: 0; cursor: pointer; }
+.destaque-confiavel { color: #ff3385; font-weight: bold; }
+.destaque-acessos { color: #ffcc00; font-weight: bold; border-bottom: 1px dashed #ff3385; padding-bottom: 8px; margin-bottom: 5px; }
+
+.caixa-backup { margin-top: 15px; border-top: 1px dashed #ff3385; padding-top: 15px; display: none; }
+</style>
+</head>
+<body>
+
+<header>
+<div class="logo">! KanK</div>
+<div class="hamburguer" id="btnMenu" onclick="abrirOuFecharMenu()">☰</div>
+<nav class="menu" id="menuPrincipal">
+<a onclick="irParaPagina('inicio')">Início</a>
+<a onclick="irParaPagina('tiktok')">TikToks do servidor</a>
+<a onclick="irParaPagina('trofeus')">Troféus</a>
+<a onclick="irParaPagina('cargos')" class="item-restrito" id="itemCargos">Cargos</a>
+<a onclick="irParaPagina('ranking')">Ranking Semanal</a>
+<a onclick="irParaPagina('armazenamento')" class="item-restrito" id="itemArmazenamento">Armazenamento</a>
+<a onclick="irParaPagina('login')" id="itemAltaElite">Alta elite</a>
+<a onclick="irParaPagina('configuracao')" class="item-restrito" id="itemConfAcessos">Conf. Acessos</a>
+</nav>
+</header>
+
+<div class="conteudo">
+<!-- INÍCIO -->
+<div id="pag-inicio" class="pagina ativa">
+<img id="imgBanner" class="banner-inicio" src="banner1.jpg" alt="Banner ! KanK">
+
+<h1 class="titulo">Bem-vindo à ! KanK</h1>
+<p class="texto">Uma comunidade para jogos, conversas e novas amizades.</p>
+<a href="https://discord.gg/kank" target="_blank" class="botao">Entre!</a>
+</div>
+
+<!-- TIKTOKS -->
+<div id="pag-tiktok" class="pagina">
+<h1 class="titulo">TikToks do servidor</h1>
+<div style="display:flex; flex-direction:column; gap:10px; margin-top:20px;">
+<a href="https://www.tiktok.com/@kankdc?_r=1&_t=ZS-98JMMgwgFgQ" target="_blank" class="botao" style="text-align:center;">! KanK</a>
+<a href="https://www.tiktok.com/@pequenosgarotinhos?_r=1&_t=ZS-98JMNXF7gfa" target="_blank" class="botao" style="text-align:center;">2pe e True</a>
+</div>
+</div>
+
+<!-- TROFÉUS -->
+<div id="pag-trofeus" class="pagina">
+<h1 class="titulo">Troféus</h1>
+<p class="texto">Cada um mantém a organização e ordem do servidor de uma forma diferente, sempre de maneira pacífica e legalizada.</p>
+<div id="lista-trofeus"></div>
+<button class="btn-adicionar" id="btnAddTrofeus" onclick="abrirModalNovo('trofeus')">+ Adicionar</button>
+</div>
+
+<!-- CARGOS -->
+<div id="pag-cargos" class="pagina">
+<h1 class="titulo">Cargos do Servidor</h1>
+<div id="lista-cargos"></div>
+<button class="btn-adicionar" id="btnAddCargos" onclick="abrirModalNovo('cargos')">+ Adicionar Cargo</button>
+</div>
+
+<!-- ARMAZENAMENTO -->
+<div id="pag-armazenamento" class="pagina">
+<h1 class="titulo">Armazenamento de Mídia</h1>
+<p class="texto">Faça upload de fotos e vídeos para ficarem guardados no site.</p>
+<div style="margin-bottom: 20px;">
+<input type="file" id="inputMidia" accept="image/,video/" style="display:none;" onchange="fazerUploadMidia(event)">
+<button onclick="document.getElementById('inputMidia').click()" class="botao" style="border-radius:8px;">📁 Enviar Foto ou Vídeo</button>
+</div>
+<div class="grade-armazenamento" id="gradeMidias"></div>
+</div>
+
+<!-- RANKING SEMANAL -->
+<div id="pag-ranking" class="pagina">
+<h1 class="titulo">Ranking Semanal</h1>
+<div class="navegacao-ranking">
+<button class="btn-ranking ativo" id="abaChamada" onclick="alternarAbaRanking('chamada')">CALL</button>
+<button class="btn-ranking" id="abaMsgs" onclick="alternarAbaRanking('mensagens')">CHAT</button>
+</div>
+<div id="conteudoRanking"></div>
+<button class="btn-adicionar" id="btnAddRanking" onclick="abrirModalNovoRanking()">+ Adicionar</button>
+</div>
+
+<!-- ALTA ELITE (LOGIN) -->
+<div id="pag-login" class="pagina">
+<h1 class="titulo">Alta Elite</h1>
+<div class="caixa-login" id="boxFormLogin">
+<input type="text" id="campoUsuario" placeholder="Usuário" autocomplete="off">
+<div class="grupo-senha">
+<input type="password" id="campoSenha" placeholder="Senha">
+<button type="button" class="btn-olho" onclick="alternarVisibilidadeSenha()">👁️</button>
+</div>
+<button style="width:100%;" onclick="executarLogin()">Entrar</button>
+<div class="erro" id="msgErroLogin">Usuário ou senha inválidos.</div>
+</div>
+
+<div class="caixa-login" id="boxSucessoLogin" style="display:none; text-align:center;">
+<p class="texto" id="txtBoasVindas" style="font-weight:bold; font-size:18px; margin-bottom:5px;"></p>
+<p class="texto" id="txtTipoAcesso" style="color:#aaa; font-size:14px; margin-bottom:15px;"></p>
+
+<!-- Apenas Moderador Confiável / Dono visualizam os botões do arquivo -->
+<div class="caixa-backup" id="boxAreaBackup">
+<p class="texto" style="font-size:13px; color:#ff3385;">💾 <b>Gerenciar Arquivo de Dados:</b></p>
+<button onclick="exportarDados()" style="width:100%; margin-bottom:8px;">📥 Baixar Arquivo (Backup)</button>
+<input type="file" id="inputImportar" accept=".json" style="display:none;" onchange="importarDados(event)">
+<button onclick="document.getElementById('inputImportar').click()" style="background:#222; border:1px solid #ff3385; color:#ff3385; width:100%; margin-bottom:15px;">📤 Carregar/Mudar Arquivo</button>
+</div>
+
+<button onclick="executarLogout()" style="background:#441122; border:1px solid #ff3385; color:#fff; width:100%;">Sair da Conta</button>
+</div>
+</div>
+
+<!-- CONF. ACESSOS -->
+<div id="pag-configuracao" class="pagina">
+<h1 class="titulo">Conf. Acessos</h1>
+<div id="lista-acessos"></div>
+<button class="btn-adicionar" id="btnAddAcessos" onclick="abrirModalNovoAcesso()">+ Cadastrar Acesso</button>
+</div>
+</div>
+
+<!-- MODAL DE EDIÇÃO -->
+<div class="fundo-modal" id="fundoModal" onclick="fecharModal()"></div>
+<div class="modal-editar" id="modalForm">
+<h2 class="titulo" id="modalTitulo" style="font-size:20px; margin-top:0;">Editar</h2>
+<form id="formGeral" onsubmit="salvarFormularioModal(event)">
+<input type="hidden" id="modalCtx">
+<input type="hidden" id="modalIndex">
+
+<div id="camposPadrao">
+<input type="text" id="inpNome" placeholder="Nome">
+<input type="text" id="inpTag" placeholder="Tag">
+<div id="boxCorCargo" style="display:none; margin:8px 0;">
+<label style="color:#aaa; font-size:14px;">Cor do Cargo:</label>
+<input type="color" id="inpCorCargo" value="#ff3385">
+
+<label style="color:#aaa; font-size:14px; margin-top:10px; display:block;">Imagem do Cargo (Link ou Nome do Arquivo):</label>
+<input type="text" id="inpImgCargoLink" placeholder="ex: imagem.png ou https://...">
+</div>
+<input type="text" id="inpDesc" placeholder="Descrição / Valor">
+</div>
+
+<div id="camposAcessos" style="display:none;">
+<input type="text" id="inpSenhaAcesso" placeholder="Senha">
+<div class="checkbox-container">
+<label class="checkbox-item destaque-confiavel">
+<input type="checkbox" id="chkConfiavel" onchange="alternarModeradorConfiavel(this.checked)">
+⭐ Moderador Confiável (Modifica Tudo)
+</label>
+
+<label class="checkbox-item destaque-acessos">
+<input type="checkbox" id="chkAcessos">
+🔑 Configurar Acessos
+</label>
+
+<label class="checkbox-item"><input type="checkbox" id="chkCargos" class="chk-perm"> Modificar Cargos</label>
+<label class="checkbox-item"><input type="checkbox" id="chkTrofeus" class="chk-perm"> Modificar Troféus</label>
+<label class="checkbox-item"><input type="checkbox" id="chkAdms" class="chk-perm"> Modificar Administradores</label>
+<label class="checkbox-item"><input type="checkbox" id="chkRanking" class="chk-perm"> Modificar Ranking</label>
+</div>
+</div>
+
+<div style="display:flex; justify-content:flex-end; gap:10px; margin-top:15px;">
+<button type="button" class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+<button type="submit">Salvar</button>
+</div>
+</form>
+</div>
+
+<!-- MODAL DE MENSAGENS -->
+<div class="fundo-modal" id="fundoModalAviso" style="z-index: 1000;"></div>
+<div class="modal-editar" id="modalAviso" style="z-index: 1001; text-align: center;">
+<h2 class="titulo" id="avisoTitulo" style="font-size:20px; margin-top:0;">Mensagem</h2>
+<p class="texto" id="avisoTexto" style="margin: 15px 0; color:#fff;"></p>
+<div style="display:flex; justify-content:center; gap:10px; margin-top:20px;">
+<button type="button" id="btnAvisoCancelar" class="btn-cancelar" style="display:none;">Cancelar</button>
+<button type="button" id="btnAvisoConfirmar">OK</button>
+</div>
+</div>
+
+<script>
+const DONO_PROTEGIDO = "fcw.";
+const DONOS = ["fcw.", "ruminancia"];
+
+let acessosPadrao = {
+"fcw.": { senha: "131117", eConfiavel: true, podeAcessos: true, podeCargos: true, podeTrofeus: true, podeAdms: true, podeRanking: true },
+"ruminancia": { senha: "150823", eConfiavel: true, podeAcessos: true, podeCargos: true, podeTrofeus: true, podeAdms: true, podeRanking: true },
+"nottrustmee": { senha: "030626", eConfiavel: false, podeAcessos: false, podeCargos: false, podeTrofeus: false, podeAdms: false, podeRanking: false },
+"u0dt": { senha: "210226", eConfiavel: false, podeAcessos: false, podeCargos: false, podeTrofeus: false, podeAdms: false, podeRanking: false },
+"j0dt": { senha: "050526", eConfiavel: false, podeAcessos: false, podeCargos: false, podeTrofeus: false, podeAdms: false, podeRanking: false }
+};
+
+let trofeusPadrao = [
+{ nome: "fcw.", tag: "fcw.", desc: "Dono do servidor." },
+{ nome: "Suppreme", tag: "nottrustmee", desc: "Administrador de confiança que ajuda na organização do servidor." }
+ ];
+
+let cargosPadrao = [
+{ nome: "Dono", tag: "@Dono", cor: "#ff3385", img: "", desc: "Posse e gerenciamento total do servidor." },
+{ nome: "Moderador", tag: "@Mod", cor: "#3b82f6", img: "", desc: "Supervisão de chats e chamadas." }
+ ];
+
+let rkChamadaPadrao = [{ nome: "fcw.", tag: "fcw.", valor: "42h 15min" }];
+let rkMsgsPadrao = [{ nome: "True", tag: "u0dt", valor: "1.850 mensagens" }];
+
+let acessos = JSON.parse(localStorage.getItem('kank_acessos')) || acessosPadrao;
+let trofeus = JSON.parse(localStorage.getItem('kank_trofeus')) || trofeusPadrao;
+let cargos = JSON.parse(localStorage.getItem('kank_cargos')) || cargosPadrao;
+let rkChamada = JSON.parse(localStorage.getItem('kank_rk_chamada')) || rkChamadaPadrao;
+let rkMsgs = JSON.parse(localStorage.getItem('kank_rk_msgs')) || rkMsgsPadrao;
+let midiasArmazenadas = JSON.parse(localStorage.getItem('kank_midias')) || [];
+
+let usuarioAtual = null;
+let abaRanking = 'chamada';
+
+function salvarTudo() {
+localStorage.setItem('kank_acessos', JSON.stringify(acessos));
+localStorage.setItem('kank_trofeus', JSON.stringify(trofeus));
+localStorage.setItem('kank_cargos', JSON.stringify(cargos));
+localStorage.setItem('kank_rk_chamada', JSON.stringify(rkChamada));
+localStorage.setItem('kank_rk_msgs', JSON.stringify(rkMsgs));
+localStorage.setItem('kank_midias', JSON.stringify(midiasArmazenadas));
+}
+
+function buscar(id) { return document.getElementById(id); }
+function ehDono(usr) { return DONOS.includes(usr); }
+
+function podeModificar(permissao) {
+if (!usuarioAtual || !acessos[usuarioAtual]) return false;
+
+// Se for acesso às configurações de acesso, requer ser Dono ou ter permissão explícita
+if (permissao === 'podeAcessos') {
+return ehDono(usuarioAtual) || !!acessos[usuarioAtual].podeAcessos;
+}
+
+// Para as demais permissões, Dono e Moderador Confiável têm acesso liberado
+if (ehDono(usuarioAtual) || acessos[usuarioAtual].eConfiavel) return true;
+
+return !!acessos[usuarioAtual][permissao];
+}
+
+function alternarModeradorConfiavel(marcado) {
+document.querySelectorAll('.chk-perm').forEach(chk => {
+chk.checked = marcado;
+chk.disabled = marcado;
+});
+}
+
+function exibirAvisoCustomizado(mensagem, ehConfirmacao = false, callbackConfirmar = null) {
+const fundo = buscar('fundoModalAviso');
+const modal = buscar('modalAviso');
+const txt = buscar('avisoTexto');
+const btnCancel = buscar('btnAvisoCancelar');
+const btnConf = buscar('btnAvisoConfirmar');
+
+txt.innerText = mensagem;
+fundo.style.display = 'block';
+modal.style.display = 'block';
+
+if (ehConfirmacao) {
+btnCancel.style.display = 'inline-block';
+btnCancel.onclick = function() {
+fundo.style.display = 'none';
+modal.style.display = 'none';
+};
+btnConf.onclick = function() {
+fundo.style.display = 'none';
+modal.style.display = 'none';
+if (callbackConfirmar) callbackConfirmar();
+};
+} else {
+btnCancel.style.display = 'none';
+btnConf.onclick = function() {
+fundo.style.display = 'none';
+modal.style.display = 'none';
+};
+}
+}
+
+function abrirOuFecharMenu() {
+const m = buscar('menuPrincipal');
+if (m) m.classList.toggle('aberto');
+}
+
+function irParaPagina(id) {
+if ((id === 'armazenamento' || id === 'cargos') && !usuarioAtual) {
+irParaPagina('login');
+return;
+}
+if (id === 'configuracao' && (!usuarioAtual || !podeModificar('podeAcessos'))) {
+irParaPagina('inicio');
+return;
+}
+
+const menu = buscar('menuPrincipal');
+if (menu) menu.classList.remove('aberto');
+
+document.querySelectorAll('.pagina').forEach(p => p.classList.remove('ativa'));
+const alvo = buscar('pag-' + id);
+if (alvo) alvo.classList.add('ativa');
+}
+
+function alternarVisibilidadeSenha() {
+const inp = buscar('campoSenha');
+if (inp) inp.type = (inp.type === 'password') ? 'text' : 'password';
+}
+
+function executarLogin() {
+const u = buscar('campoUsuario') ? buscar('campoUsuario').value.trim() : '';
+const s = buscar('campoSenha') ? buscar('campoSenha').value.trim() : '';
+const erro = buscar('msgErroLogin');
+
+if (acessos[u] && acessos[u].senha === s) {
+if (erro) erro.style.display = 'none';
+usuarioAtual = u;
+exibirAvisoCustomizado(✅ Bem-vindo(a), ${u}!`);
+atualizarInterface();
+if (buscar('campoUsuario')) buscar('campoUsuario').value = '';
+if (buscar('campoSenha')) buscar('campoSenha').value = '';
+} else {
+if (erro) erro.style.display = 'block';
+}
+}
+
+function executarLogout() {
+usuarioAtual = null;
+atualizarInterface();
+irParaPagina('inicio');
+}
+
+function exportarDados() {
+if (!usuarioAtual || (!ehDono(usuarioAtual) && !acessos[usuarioAtual].eConfiavel)) {
+exibirAvisoCustomizado("❌ Apenas moderadores confiáveis podem baixar arquivos!");
+return;
+}
+const dadosCompletos = { acessos, trofeus, cargos, rkChamada, rkMsgs, midiasArmazenadas };
+const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dadosCompletos, null, 2));
+const downloadAnchor = document.createElement('a');
+downloadAnchor.setAttribute("href", dataStr);
+downloadAnchor.setAttribute("download", "kank_dados_site.json");
+document.body.appendChild(downloadAnchor);
+downloadAnchor.click();
+downloadAnchor.remove();
+exibirAvisoCustomizado("📥 Backup baixado com sucesso!");
+}
+
+function importarDados(e) {
+if (!usuarioAtual || (!ehDono(usuarioAtual) && !acessos[usuarioAtual].eConfiavel)) {
+exibirAvisoCustomizado("❌ Apenas moderadores confiáveis podem carregar arquivos!");
+return;
+}
+const file = e.target.files[0];
+if (!file) return;
+const reader = new FileReader();
+reader.onload = function(evt) {
+try {
+const dados = JSON.parse(evt.target.result);
+if (dados.cargos) cargos = dados.cargos;
+if (dados.trofeus) trofeus = dados.trofeus;
+if (dados.acessos) acessos = dados.acessos;
+if (dados.rkChamada) rkChamada = dados.rkChamada;
+if (dados.rkMsgs) rkMsgs = dados.rkMsgs;
+if (dados.midiasArmazenadas) midiasArmazenadas = dados.midiasArmazenadas;
+
+salvarTudo();
+atualizarInterface();
+exibirAvisoCustomizado("✅ Backup carregado com sucesso!");
+} catch (err) {
+exibirAvisoCustomizado("❌ Arquivo de backup inválido.");
+}
+};
+reader.readAsText(file);
+}
+
+function atualizarInterface() {
+const logado = !!usuarioAtual;
+const eDono = logado && ehDono(usuarioAtual);
+const eConfiavel = logado && acessos[usuarioAtual] && acessos[usuarioAtual].eConfiavel;
+
+const itemCarg = buscar('itemCargos');
+const itemArm = buscar('itemArmazenamento');
+const itemA = buscar('itemConfAcessos');
+
+if (itemCarg) itemCarg.style.display = logado ? 'block' : 'none';
+if (itemArm) itemArm.style.display = logado ? 'block' : 'none';
+if (itemA) itemA.style.display = podeModificar('podeAcessos') ? 'block' : 'none';
+
+const fLog = buscar('boxFormLogin');
+const sLog = buscar('boxSucessoLogin');
+const txtV = buscar('txtBoasVindas');
+const txtT = buscar('txtTipoAcesso');
+const areaBackup = buscar('boxAreaBackup');
+
+if (logado) {
+if (fLog) fLog.style.display = 'none';
+if (sLog) sLog.style.display = 'block';
+if (txtV) txtV.innerText = Olá,${usuarioAtual}!`;
+if (txtT) {
+if (eDono) txtT.innerText = "Nível de Acesso: Dono (Total)";
+else if (eConfiavel) txtT.innerText = "Nível de Acesso: Moderador Confiável";
+else txtT.innerText = "Nível de Acesso: Personalizado";
+}
+// Apenas Confiáveis / Donos enxergam a opção de carregar/baixar arquivo
+if (areaBackup) areaBackup.style.display = (eDono || eConfiavel) ? 'block' : 'none';
+} else {
+if (fLog) fLog.style.display = 'block';
+if (sLog) sLog.style.display = 'none';
+}
+
+if (buscar('btnAddTrofeus')) buscar('btnAddTrofeus').style.display = podeModificar('podeTrofeus') ? 'block' : 'none';
+if (buscar('btnAddCargos')) buscar('btnAddCargos').style.display = podeModificar('podeCargos') ? 'block' : 'none';
+if (buscar('btnAddRanking')) buscar('btnAddRanking').style.display = podeModificar('podeRanking') ? 'block' : 'none';
+if (buscar('btnAddAcessos')) buscar('btnAddAcessos').style.display = podeModificar('podeAcessos') ? 'block' : 'none';
+
+renderizarTrofeus();
+renderizarCargos();
+renderizarArmazenamento();
+renderizarRanking();
+renderizarAcessos();
+}
+
+function renderizarCargos() {
+const el = buscar('lista-cargos');
+if (!el) return;
+const pode = podeModificar('podeCargos');
+if (cargos.length === 0) {
+el.innerHTML = '<p class="texto" style="color:#888;">Nenhum cargo registrado.</p>';
+return;
+}
+el.innerHTML = cargos.map((c, i) => &lt;div class="item-cargo"&gt; &lt;div&gt; &lt;div class="cargo-nome" style="color:${c.cor || '#ff3385'};">
+<span class="badge-cor" style="background-color:${c.cor || '#ff3385'};"&gt;&lt;/span&gt; ${c.nome}
+</div>
+${c.img ?: ''} &lt;div class="cargo-tag"&gt;${c.tag || ''}</div>
+<div class="texto" style="margin:0;">{pode ? &lt;div class="acao-item"&gt; &lt;button class="btn-lapis" onclick="abrirModalEditar('cargos', ${i})">✏️</button>
+<button class="btn-lixeira" onclick="apagarItem('cargos', ${i})"&gt;🗑️&lt;/button&gt; &lt;/div&gt; : ''}
+</div>
+`).join('');
+}
+
+function renderizarTrofeus() {
+const el = buscar('lista-trofeus');
+if (!el) return;
+const pode = podeModificar('podeTrofeus');
+el.innerHTML = trofeus.map((t, i) => &lt;div class="admin-item"&gt; &lt;div&gt; &lt;div class="admin-nome"&gt;${t.nome}</div>
+<div class="admin-tag">${t.tag}&lt;/div&gt; &lt;div class="texto" style="margin:0;"&gt;${t.desc}</div>
+</div>
+${pode ?
+<div class="acao-item">
+<button class="btn-lapis" onclick="abrirModalEditar('trofeus', {i})">🗑️</button>
+</div>
+: ''} &lt;/div&gt;).join('');
+}
+
+function fazerUploadMidia(e) {
+const file = e.target.files[0];
+if (!file) return;
+const reader = new FileReader();
+reader.onload = function (evt) {
+midiasArmazenadas.push({
+tipo: file.type.startsWith('video') ? 'video' : 'imagem',
+src: evt.target.result,
+nome: file.name
+});
+salvarTudo();
+renderizarArmazenamento();
+};
+reader.readAsDataURL(file);
+}
+
+function renderizarArmazenamento() {
+const el = buscar('gradeMidias');
+if (!el) return;
+if (midiasArmazenadas.length === 0) {
+el.innerHTML = '<p class="texto" style="color:#888; grid-column: 1/-1;">Nenhuma mídia armazenada no momento.</p>';
+return;
+}
+
+const eDono = usuarioAtual && ehDono(usuarioAtual);
+el.innerHTML = midiasArmazenadas.map((m, i) => &lt;div class="card-midia"&gt; ${eDono ? <button class="btn-excluir-midia" onclick="excluirMidia(${i})">✕</button>: ''} ${m.tipo === 'video' ? <video src="${m.src}" controls></video>:} &lt;/div&gt;).join('');
+}
+
+function excluirMidia(idx) {
+exibirAvisoCustomizado("Deseja apagar esta mídia do armazenamento?", true, function() {
+midiasArmazenadas.splice(idx, 1);
+salvarTudo();
+renderizarArmazenamento();
+});
+}
+
+function alternarAbaRanking(aba) {
+abaRanking = aba;
+if (buscar('abaChamada')) buscar('abaChamada').classList.toggle('ativo', aba === 'chamada');
+if (buscar('abaMsgs')) buscar('abaMsgs').classList.toggle('ativo', aba === 'mensagens');
+renderizarRanking();
+}
+
+function renderizarRanking() {
+const el = buscar('conteudoRanking');
+if (!el) return;
+const pode = podeModificar('podeRanking');
+const lista = (abaRanking === 'chamada') ? rkChamada : rkMsgs;
+
+el.innerHTML = lista.map((r, i) => &lt;div class="item-ranking"&gt; &lt;div style="display:flex; align-items:center; gap:10px;"&gt; &lt;div class="posicao"&gt;${i + 1}º</div>
+<div>
+<div class="ranking-nome">{r.tag}</div>
+<div class="ranking-info">{pode ? &lt;div class="acao-item"&gt; &lt;button class="btn-lapis" onclick="abrirModalEditar('rk_${abaRanking}', ${i})"&gt;✏️&lt;/button&gt; &lt;button class="btn-lixeira" onclick="apagarItem('rk_${abaRanking}', ${i})"&gt;🗑️&lt;/button&gt; &lt;/div&gt; : ''}
+</div>
+`).join('');
+}
+
+function renderizarAcessos() {
+const el = buscar('lista-acessos');
+if (!el) return;
+const pode = podeModificar('podeAcessos');
+
+el.innerHTML = Object.keys(acessos).map(usr => {
+const eProtegido = (usr === DONO_PROTEGIDO);
+return &lt;div class="admin-item"&gt; &lt;div&gt; &lt;div class="admin-nome"&gt; ${usr} ${acessos[usr].eConfiavel ? '&lt;span style="font-size:12px; color:#ff3385;"&gt;[⭐ Confiável]&lt;/span&gt;' : ''} &lt;/div&gt; &lt;div class="admin-tag"&gt;Senha: ${acessos[usr].senha}</div>
+</div>
+${pode ?
+<div class="acao-item">
+<button class="btn-lapis" onclick="abrirModalEditarAcesso('{!eProtegido ? <button class="btn-lixeira" onclick="apagarAcesso('${usr}')"&gt;🗑️&lt;/button> : ''}
+</div>
+: ''} &lt;/div&gt;;
+}).join('');
+}
+
+function limparModal() {
+if (buscar('camposPadrao')) buscar('camposPadrao').style.display = 'block';
+if (buscar('camposAcessos')) buscar('camposAcessos').style.display = 'none';
+if (buscar('boxCorCargo')) buscar('boxCorCargo').style.display = 'none';
+if (buscar('inpNome')) { buscar('inpNome').style.display = 'block'; buscar('inpNome').disabled = false; buscar('inpNome').value = ''; }
+if (buscar('inpTag')) { buscar('inpTag').style.display = 'block'; buscar('inpTag').value = ''; }
+if (buscar('inpDesc')) { buscar('inpDesc').style.display = 'block'; buscar('inpDesc').value = ''; }
+if (buscar('inpImgCargoLink')) buscar('inpImgCargoLink').value = '';
+
+if (buscar('chkConfiavel')) buscar('chkConfiavel').checked = false;
+if (buscar('chkAcessos')) buscar('chkAcessos').checked = false;
+alternarModeradorConfiavel(false);
+}
+
+function exibirModal() {
+if (buscar('fundoModal')) buscar('fundoModal').style.display = 'block';
+if (buscar('modalForm')) buscar('modalForm').style.display = 'block';
+}
+
+function fecharModal() {
+if (buscar('fundoModal')) buscar('fundoModal').style.display = 'none';
+if (buscar('modalForm')) buscar('modalForm').style.display = 'none';
+}
+
+function abrirModalNovo(tipo) {
+if (!podeModificar('pode' + tipo.charAt(0).toUpperCase() + tipo.slice(1))) return;
+limparModal();
+if (buscar('modalTitulo')) buscar('modalTitulo').innerText = 'Adicionar Item';
+if (buscar('modalCtx')) buscar('modalCtx').value = tipo + '_novo';
+if (tipo === 'cargos' && buscar('boxCorCargo')) buscar('boxCorCargo').style.display = 'block';
+exibirModal();
+}
+
+function abrirModalNovoRanking() {
+if (!podeModificar('podeRanking')) return;
+limparModal();
+if (buscar('modalTitulo')) buscar('modalTitulo').innerText = 'Adicionar Posição';
+if (buscar('modalCtx')) buscar('modalCtx').value = 'rk_novo';
+exibirModal();
+}
+
+function abrirModalEditar(tipo, idx) {
+limparModal();
+let item;
+if (tipo === 'trofeus') item = trofeus[idx];
+else if (tipo === 'cargos') item = cargos[idx];
+else if (tipo === 'rk_chamada') item = rkChamada[idx];
+else if (tipo === 'rk_mensagens') item = rkMsgs[idx];
+
+if (!item) return;
+
+if (buscar('modalTitulo')) buscar('modalTitulo').innerText = 'Editar Item';
+if (buscar('modalCtx')) buscar('modalCtx').value = tipo + '_edit';
+if (buscar('modalIndex')) buscar('modalIndex').value = idx;
+
+if (buscar('inpNome')) buscar('inpNome').value = item.nome || '';
+if (buscar('inpTag')) buscar('inpTag').value = item.tag || '';
+if (buscar('inpDesc')) buscar('inpDesc').value = item.desc || item.valor || '';
+
+if (tipo === 'cargos') {
+if (buscar('boxCorCargo')) buscar('boxCorCargo').style.display = 'block';
+if (buscar('inpCorCargo')) buscar('inpCorCargo').value = item.cor || '#ff3385';
+if (buscar('inpImgCargoLink')) buscar('inpImgCargoLink').value = item.img || '';
+}
+exibirModal();
+}
+
+function abrirModalNovoAcesso() {
+if (!podeModificar('podeAcessos')) return;
+limparModal();
+if (buscar('modalTitulo')) buscar('modalTitulo').innerText = 'Cadastrar Acesso';
+if (buscar('modalCtx')) buscar('modalCtx').value = 'acesso_novo';
+if (buscar('inpTag')) buscar('inpTag').style.display = 'none';
+if (buscar('inpDesc')) buscar('inpDesc').style.display = 'none';
+if (buscar('camposAcessos')) buscar('camposAcessos').style.display = 'block';
+exibirModal();
+}
+
+function abrirModalEditarAcesso(usr) {
+if (!podeModificar('podeAcessos')) return;
+limparModal();
+const a = acessos[usr];
+if (!a) return;
+
+if (buscar('modalTitulo')) buscar('modalTitulo').innerText = 'Editar Acesso: ' + usr;
+if (buscar('modalCtx')) buscar('modalCtx').value = 'acesso_edit';
+if (buscar('modalIndex')) buscar('modalIndex').value = usr;
+
+if (buscar('inpTag')) buscar('inpTag').style.display = 'none';
+if (buscar('inpDesc')) buscar('inpDesc').style.display = 'none';
+if (buscar('camposAcessos')) buscar('camposAcessos').style.display = 'block';
+
+if (buscar('inpNome')) {
+buscar('inpNome').value = usr;
+if (usr === DONO_PROTEGIDO) {
+buscar('inpNome').disabled = true;
+}
+}
+if (buscar('inpSenhaAcesso')) buscar('inpSenhaAcesso').value = a.senha;
+
+const confiavel = !!a.eConfiavel;
+if (buscar('chkConfiavel')) buscar('chkConfiavel').checked = confiavel;
+if (buscar('chkAcessos')) buscar('chkAcessos').checked = !!a.podeAcessos;
+
+alternarModeradorConfiavel(confiavel);
+
+if (!confiavel) {
+if (buscar('chkCargos')) buscar('chkCargos').checked = a.podeCargos;
+if (buscar('chkTrofeus')) buscar('chkTrofeus').checked = a.podeTrofeus;
+if (buscar('chkAdms')) buscar('chkAdms').checked = a.podeAdms;
+if (buscar('chkRanking')) buscar('chkRanking').checked = a.podeRanking;
+}
+
+if (usr === DONO_PROTEGIDO) {
+if (buscar('chkConfiavel')) {
+buscar('chkConfiavel').checked = true;
+buscar('chkConfiavel').disabled = true;
+}
+if (buscar('chkAcessos')) {
+buscar('chkAcessos').checked = true;
+buscar('chkAcessos').disabled = true;
+}
+alternarModeradorConfiavel(true);
+}
+
+exibirModal();
+}
+
+function salvarFormularioModal(e) {
+e.preventDefault();
+
+const ctx = buscar('modalCtx') ? buscar('modalCtx').value : '';
+const idx = buscar('modalIndex') ? buscar('modalIndex').value : '';
+
+const nm = buscar('inpNome') ? buscar('inpNome').value.trim() : '';
+const tg = buscar('inpTag') ? buscar('inpTag').value.trim() : '';
+const dc = buscar('inpDesc') ? buscar('inpDesc').value.trim() : '';
+const cor = buscar('inpCorCargo') ? buscar('inpCorCargo').value : '#ff3385';
+const imgLink = buscar('inpImgCargoLink') ? buscar('inpImgCargoLink').value.trim() : '';
+
+if (ctx === 'trofeus_novo') trofeus.push({ nome: nm, tag: tg, desc: dc });
+else if (ctx === 'trofeus_edit') trofeus[idx] = { nome: nm, tag: tg, desc: dc };
+else if (ctx === 'cargos_novo') cargos.push({ nome: nm, tag: tg, cor: cor, img: imgLink, desc: dc });
+else if (ctx === 'cargos_edit') cargos[idx] = { nome: nm, tag: tg, cor: cor, img: imgLink, desc: dc };
+else if (ctx === 'rk_novo') {
+const item = { nome: nm, tag: tg, valor: dc };
+if (abaRanking === 'chamada') rkChamada.push(item);
+else rkMsgs.push(item);
+} else if (ctx === 'rk_chamada_edit') rkChamada[idx] = { nome: nm, tag: tg, valor: dc };
+else if (ctx === 'rk_mensagens_edit') rkMsgs[idx] = { nome: nm, tag: tg, valor: dc };
+else if (ctx === 'acesso_novo' || ctx === 'acesso_edit') {
+const pwd = buscar('inpSenhaAcesso') ? buscar('inpSenhaAcesso').value.trim() : '';
+const eConf = buscar('chkConfiavel') ? buscar('chkConfiavel').checked : false;
+const pAcessos = buscar('chkAcessos') ? buscar('chkAcessos').checked : false;
+
+const obj = {
+senha: pwd,
+eConfiavel: eConf,
+podeAcessos: pAcessos,
+podeCargos: eConf || (buscar('chkCargos') ? buscar('chkCargos').checked : false),
+podeTrofeus: eConf || (buscar('chkTrofeus') ? buscar('chkTrofeus').checked : false),
+podeAdms: eConf || (buscar('chkAdms') ? buscar('chkAdms').checked : false),
+podeRanking: eConf || (buscar('chkRanking') ? buscar('chkRanking').checked : false)
+};
+
+if (idx === DONO_PROTEGIDO || nm === DONO_PROTEGIDO) {
+acessos[DONO_PROTEGIDO] = { ...obj, eConfiavel: true, podeAcessos: true, podeCargos: true, podeTrofeus: true, podeAdms: true, podeRanking: true };
+} else {
+if (ctx === 'acesso_edit' && idx !== nm) delete acessos[idx];
+acessos[nm] = obj;
+}
+}
+
+salvarTudo();
+atualizarInterface();
+fecharModal();
+}
+
+function apagarItem(tipo, idx) {
+exibirAvisoCustomizado("Tem certeza que deseja apagar? Esta ação é irreversível.", true, function() {
+if (tipo === 'trofeus') trofeus.splice(idx, 1);
+else if (tipo === 'cargos') cargos.splice(idx, 1);
+else if (tipo === 'rk_chamada') rkChamada.splice(idx, 1);
+else if (tipo === 'rk_mensagens') rkMsgs.splice(idx, 1);
+salvarTudo();
+atualizarInterface();
+});
+}
+
+function apagarAcesso(usr) {
+if (usr === DONO_PROTEGIDO) {
+exibirAvisoCustomizado("❌ A conta do dono (fcw.) não pode ser excluída!");
+return;
+}
+exibirAvisoCustomizado("Tem certeza que deseja apagar este acesso?", true, function() {
+delete acessos[usr];
+salvarTudo();
+atualizarInterface();
+});
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+atualizarInterface();
+});
+</script>
+
+</body>
+</html>
