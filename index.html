@@ -284,7 +284,7 @@
 
         <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:15px;">
             <button type="button" class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
-            <button type="submit">Salvar</button>
+            <button type="submit" id="btnSalvarModal">Salvar</button>
         </div>
     </form>
 </div>
@@ -380,8 +380,10 @@
             await setDoc(doc(db, "kank_dados", "principal"), {
                 acessos, trofeus, cargos, rkChamada, rkMsgs, banidos, midias: midiasArmazenadas
             });
+            return true;
         } catch (e) {
             console.log("Erro ao salvar nuvem:", e);
+            return false;
         }
     }
 
@@ -866,9 +868,16 @@
             }
         }
 
-        await salvarTudoNuvem();
-        atualizarInterface();
+        // Fecha o modal imediatamente para o usuário não ficar preso
         window.fecharModal();
+
+        // Salva na nuvem em segundo plano
+        const salvo = await salvarTudoNuvem();
+        if (!salvo) {
+            window.exibirAvisoCustomizado("⚠️ Erro ao salvar na nuvem do Firebase, verifique sua conexão.");
+        }
+
+        atualizarInterface();
     };
 
     window.apagarItem = function(tipo, idx) {
