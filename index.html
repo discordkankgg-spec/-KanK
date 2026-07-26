@@ -157,6 +157,7 @@
         <a onclick="irParaPagina('cargos')" class="item-restrito" id="itemCargos">Cargos</a>
         <a onclick="irParaPagina('ranking')">Ranking Semanal</a>
         <a onclick="irParaPagina('armazenamento')" class="item-restrito" id="itemArmazenamento">Armazenamento</a>
+        <a onclick="irParaPagina('banimento')" class="item-restrito" id="itemBanimento">Banimentos</a>
         <a onclick="irParaPagina('login')" id="itemAltaElite">Alta elite</a>
         <a onclick="irParaPagina('configuracao')" class="item-restrito" id="itemConfAcessos">Conf. Acessos</a>
     </nav>
@@ -199,6 +200,13 @@
             <button onclick="document.getElementById('inputMidia').click()" class="botao" style="border-radius:8px;">📁 Enviar Foto ou Vídeo</button>
         </div>
         <div class="grade-armazenamento" id="gradeMidias"></div>
+    </div>
+
+    <div id="pag-banimento" class="pagina">
+        <h1 class="titulo">Usuários Banidos</h1>
+        <p class="texto">Registro oficial de banimentos do servidor.</p>
+        <div id="lista-banidos"></div>
+        <button class="btn-adicionar" id="btnAddBanimento" onclick="abrirModalNovo('banimento')">+ Adicionar Banido</button>
     </div>
 
     <div id="pag-ranking" class="pagina">
@@ -246,14 +254,14 @@
 
         <div id="camposPadrao">
             <input type="text" id="inpNome" placeholder="Nome">
-            <input type="text" id="inpTag" placeholder="Tag">
+            <input type="text" id="inpTag" placeholder="Nome no Discord">
             <div id="boxCorCargo" style="display:none; margin:8px 0;">
                 <label style="color:#aaa; font-size:14px;">Cor do Cargo:</label>
                 <input type="color" id="inpCorCargo" value="#ff3385">
                 <label style="color:#aaa; font-size:14px; margin-top:10px; display:block;">Imagem do Cargo (Link ou Nome):</label>
                 <input type="text" id="inpImgCargoLink" placeholder="ex: imagem.png ou https://...">
             </div>
-            <input type="text" id="inpDesc" placeholder="Descrição / Valor">
+            <input type="text" id="inpDesc" placeholder="Descrição / Motivo">
         </div>
 
         <div id="camposAcessos" style="display:none;">
@@ -332,12 +340,14 @@
 
     let rkChamadaPadrao = [{ nome: "fcw.", tag: "fcw.", valor: "42h 15min" }];
     let rkMsgsPadrao = [{ nome: "True", tag: "u0dt", valor: "1.850 mensagens" }];
+    let banidosPadrao = [];
 
     let acessos = JSON.parse(JSON.stringify(acessosPadrao));
     let trofeus = JSON.parse(JSON.stringify(trofeusPadrao));
     let cargos = JSON.parse(JSON.stringify(cargosPadrao));
     let rkChamada = JSON.parse(JSON.stringify(rkChamadaPadrao));
     let rkMsgs = JSON.parse(JSON.stringify(rkMsgsPadrao));
+    let banidos = JSON.parse(JSON.stringify(banidosPadrao));
     let midiasArmazenadas = [];
 
     let usuarioAtual = null; 
@@ -354,6 +364,7 @@
                 if (dados.cargos) cargos = dados.cargos;
                 if (dados.rkChamada) rkChamada = dados.rkChamada;
                 if (dados.rkMsgs) rkMsgs = dados.rkMsgs;
+                if (dados.banidos) banidos = dados.banidos;
                 if (dados.midias) midiasArmazenadas = dados.midias;
             } else {
                 await salvarTudoNuvem();
@@ -367,7 +378,7 @@
     async function salvarTudoNuvem() {
         try {
             await setDoc(doc(db, "kank_dados", "principal"), {
-                acessos, trofeus, cargos, rkChamada, rkMsgs, midias: midiasArmazenadas
+                acessos, trofeus, cargos, rkChamada, rkMsgs, banidos, midias: midiasArmazenadas
             });
         } catch (e) {
             console.log("Erro ao salvar nuvem:", e);
@@ -376,10 +387,15 @@
 
     function buscar(id) { return document.getElementById(id); }
     function ehDono(usr) { return DONOS.includes(usr); }
+    function ehConfiavelOuDono(usr) {
+        if (!usr || !acessos[usr]) return false;
+        return ehDono(usr) || !!acessos[usr].eConfiavel;
+    }
 
     function podeModificar(permissao) {
         if (!usuarioAtual || !acessos[usuarioAtual]) return false;
         if (permissao === 'podeAcessos') return ehDono(usuarioAtual) || !!acessos[usuarioAtual].podeAcessos;
+        if (permissao === 'banimento') return ehConfiavelOuDono(usuarioAtual);
         if (ehDono(usuarioAtual) || acessos[usuarioAtual].eConfiavel) return true;
         return !!acessos[usuarioAtual][permissao];
     }
@@ -419,6 +435,7 @@
 
     window.irParaPagina = function(id) {
         if ((id === 'armazenamento' || id === 'cargos') && !usuarioAtual) { irParaPagina('login'); return; }
+        if (id === 'banimento' && !ehConfiavelOuDono(usuarioAtual)) { irParaPagina('inicio'); return; }
         if (id === 'configuracao' && (!usuarioAtual || !podeModificar('podeAcessos'))) { irParaPagina('inicio'); return; }
         const menu = buscar('menuPrincipal');
         if (menu) menu.classList.remove('aberto');
@@ -458,14 +475,16 @@
     function atualizarInterface() {
         const logado = !!usuarioAtual;
         const eDono = logado && ehDono(usuarioAtual);
-        const eConfiavel = logado && acessos[usuarioAtual] && acessos[usuarioAtual].eConfiavel;
+        const eConfiavel = logado && ehConfiavelOuDono(usuarioAtual);
 
         const itemCarg = buscar('itemCargos');
         const itemArm = buscar('itemArmazenamento');
+        const itemBan = buscar('itemBanimento');
         const itemA = buscar('itemConfAcessos');
 
         if (itemCarg) itemCarg.style.display = logado ? 'block' : 'none';
         if (itemArm) itemArm.style.display = logado ? 'block' : 'none';
+        if (itemBan) itemBan.style.display = eConfiavel ? 'block' : 'none';
         if (itemA) itemA.style.display = podeModificar('podeAcessos') ? 'block' : 'none';
 
         const fLog = buscar('boxFormLogin');
@@ -489,12 +508,14 @@
 
         if (buscar('btnAddTrofeus')) buscar('btnAddTrofeus').style.display = podeModificar('podeTrofeus') ? 'block' : 'none';
         if (buscar('btnAddCargos')) buscar('btnAddCargos').style.display = podeModificar('podeCargos') ? 'block' : 'none';
+        if (buscar('btnAddBanimento')) buscar('btnAddBanimento').style.display = ehConfiavelOuDono(usuarioAtual) ? 'block' : 'none';
         if (buscar('btnAddRanking')) buscar('btnAddRanking').style.display = podeModificar('podeRanking') ? 'block' : 'none';
         if (buscar('btnAddAcessos')) buscar('btnAddAcessos').style.display = podeModificar('podeAcessos') ? 'block' : 'none';
 
         renderizarTrofeus();
         renderizarCargos();
         renderizarArmazenamento();
+        renderizarBanidos();
         renderizarRanking();
         renderizarAcessos();
     }
@@ -543,6 +564,31 @@
                     <div class="acao-item">
                         <button class="btn-lapis" onclick="abrirModalEditar('trofeus', ${i})">✏️</button>
                         <button class="btn-lixeira" onclick="apagarItem('trofeus', ${i})">🗑️</button>
+                    </div>
+                ` : ''}
+            </div>
+        `).join('');
+    }
+
+    function renderizarBanidos() {
+        const el = buscar('lista-banidos');
+        if (!el) return;
+        const pode = ehConfiavelOuDono(usuarioAtual);
+        if (banidos.length === 0) {
+            el.innerHTML = '<p class="texto" style="color:#888;">Nenhum usuário banido registrado.</p>';
+            return;
+        }
+        el.innerHTML = banidos.map((b, i) => `
+            <div class="admin-item">
+                <div>
+                    <div class="admin-nome" style="color:#ff3385;">${b.nome}</div>
+                    <div class="admin-tag">Discord: ${b.tag}</div>
+                    <div class="texto" style="margin:0;"><strong style="color:#aaa;">Motivo:</strong> ${b.desc}</div>
+                </div>
+                ${pode ? `
+                    <div class="acao-item">
+                        <button class="btn-lapis" onclick="abrirModalEditar('banimento', ${i})">✏️</button>
+                        <button class="btn-lixeira" onclick="apagarItem('banimento', ${i})">🗑️</button>
                     </div>
                 ` : ''}
             </div>
@@ -652,9 +698,9 @@
         if (buscar('camposPadrao')) buscar('camposPadrao').style.display = 'block';
         if (buscar('camposAcessos')) buscar('camposAcessos').style.display = 'none';
         if (buscar('boxCorCargo')) buscar('boxCorCargo').style.display = 'none';
-        if (buscar('inpNome')) { buscar('inpNome').style.display = 'block'; buscar('inpNome').disabled = false; buscar('inpNome').value = ''; }
-        if (buscar('inpTag')) { buscar('inpTag').style.display = 'block'; buscar('inpTag').value = ''; }
-        if (buscar('inpDesc')) { buscar('inpDesc').style.display = 'block'; buscar('inpDesc').value = ''; }
+        if (buscar('inpNome')) { buscar('inpNome').style.display = 'block'; buscar('inpNome').disabled = false; buscar('inpNome').value = ''; buscar('inpNome').placeholder = 'Nome'; }
+        if (buscar('inpTag')) { buscar('inpTag').style.display = 'block'; buscar('inpTag').value = ''; buscar('inpTag').placeholder = 'Tag'; }
+        if (buscar('inpDesc')) { buscar('inpDesc').style.display = 'block'; buscar('inpDesc').value = ''; buscar('inpDesc').placeholder = 'Descrição / Valor'; }
         if (buscar('inpImgCargoLink')) buscar('inpImgCargoLink').value = '';
         if (buscar('chkConfiavel')) buscar('chkConfiavel').checked = false;
         if (buscar('chkAcessos')) buscar('chkAcessos').checked = false;
@@ -672,11 +718,19 @@
     };
 
     window.abrirModalNovo = function(tipo) {
-        if (!podeModificar('pode' + tipo.charAt(0).toUpperCase() + tipo.slice(1))) return;
+        if (tipo === 'banimento' && !ehConfiavelOuDono(usuarioAtual)) return;
+        if (tipo !== 'banimento' && !podeModificar('pode' + tipo.charAt(0).toUpperCase() + tipo.slice(1))) return;
         limparModal();
         if (buscar('modalTitulo')) buscar('modalTitulo').innerText = 'Adicionar Item';
         if (buscar('modalCtx')) buscar('modalCtx').value = tipo + '_novo';
-        if (tipo === 'cargos' && buscar('boxCorCargo')) buscar('boxCorCargo').style.display = 'block';
+        
+        if (tipo === 'banimento') {
+            if (buscar('inpNome')) buscar('inpNome').placeholder = 'Nome da pessoa';
+            if (buscar('inpTag')) buscar('inpTag').placeholder = 'Nome exato no Discord';
+            if (buscar('inpDesc')) buscar('inpDesc').placeholder = 'Motivo do banimento';
+        } else if (tipo === 'cargos') {
+            if (buscar('boxCorCargo')) buscar('boxCorCargo').style.display = 'block';
+        }
         exibirModal();
     };
 
@@ -693,6 +747,7 @@
         let item;
         if (tipo === 'trofeus') item = trofeus[idx];
         else if (tipo === 'cargos') item = cargos[idx];
+        else if (tipo === 'banimento') item = banidos[idx];
         else if (tipo === 'rk_chamada') item = rkChamada[idx];
         else if (tipo === 'rk_mensagens') item = rkMsgs[idx];
         if (!item) return;
@@ -705,7 +760,11 @@
         if (buscar('inpTag')) buscar('inpTag').value = item.tag || '';
         if (buscar('inpDesc')) buscar('inpDesc').value = item.desc || item.valor || '';
 
-        if (tipo === 'cargos') {
+        if (tipo === 'banimento') {
+            if (buscar('inpNome')) buscar('inpNome').placeholder = 'Nome da pessoa';
+            if (buscar('inpTag')) buscar('inpTag').placeholder = 'Nome exato no Discord';
+            if (buscar('inpDesc')) buscar('inpDesc').placeholder = 'Motivo do banimento';
+        } else if (tipo === 'cargos') {
             if (buscar('boxCorCargo')) buscar('boxCorCargo').style.display = 'block';
             if (buscar('inpCorCargo')) buscar('inpCorCargo').value = item.cor || '#ff3385';
             if (buscar('inpImgCargoLink')) buscar('inpImgCargoLink').value = item.img || '';
@@ -779,6 +838,8 @@
         else if (ctx === 'trofeus_edit') trofeus[idx] = { nome: nm, tag: tg, desc: dc };
         else if (ctx === 'cargos_novo') cargos.push({ nome: nm, tag: tg, cor: cor, img: imgLink, desc: dc });
         else if (ctx === 'cargos_edit') cargos[idx] = { nome: nm, tag: tg, cor: cor, img: imgLink, desc: dc };
+        else if (ctx === 'banimento_novo') banidos.push({ nome: nm, tag: tg, desc: dc });
+        else if (ctx === 'banimento_edit') banidos[idx] = { nome: nm, tag: tg, desc: dc };
         else if (ctx === 'rk_novo') {
             const item = { nome: nm, tag: tg, valor: dc };
             if (abaRanking === 'chamada') rkChamada.push(item);
@@ -817,6 +878,7 @@
         window.exibirAvisoCustomizado("Tem certeza que deseja apagar? Esta ação é irreversível.", true, async function() {
             if (tipo === 'trofeus') trofeus.splice(idx, 1);
             else if (tipo === 'cargos') cargos.splice(idx, 1);
+            else if (tipo === 'banimento') banidos.splice(idx, 1);
             else if (tipo === 'rk_chamada') rkChamada.splice(idx, 1);
             else if (tipo === 'rk_mensagens') rkMsgs.splice(idx, 1);
             await salvarTudoNuvem();
