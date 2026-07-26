@@ -357,7 +357,6 @@
                 if (b.banidos) banidos = b.banidos;
                 if (b.midias) midiasArmazenadas = b.midias;
                 
-                // Validação de segurança: se o usuário atual salvo não existe mais nas credenciais, limpa o login
                 if (usuarioAtual && !acessos[usuarioAtual]) {
                     usuarioAtual = null;
                     localStorage.removeItem('kank_usuario_atual');
@@ -430,7 +429,6 @@
     window.abrirOuFecharMenu = () => buscar('menuPrincipal').classList.toggle('aberto');
     
     window.irParaPagina = function(id) {
-        // Bloqueio preventivo caso tentem entrar em páginas restritas deslogados
         if ((id === 'cargos' || id === 'armazenamento') && !usuarioAtual) {
             irParaPagina('login');
             return;
@@ -481,7 +479,6 @@
         const confiavel = logado && ehConfiavelOuDono(usuarioAtual);
         const icarDono = logado && ehDono(usuarioAtual);
 
-        // Visibilidade estrita dos itens no menu do cabeçalho
         if (buscar('itemCargos')) buscar('itemCargos').style.display = logado ? 'block' : 'none';
         if (buscar('itemArmazenamento')) buscar('itemArmazenamento').style.display = logado ? 'block' : 'none';
         if (buscar('itemBanimento')) buscar('itemBanimento').style.display = confiavel ? 'block' : 'none';
@@ -495,7 +492,6 @@
             buscar('boxFormLogin').style.display = 'block';
             buscar('boxSucessoLogin').style.display = 'none';
 
-            // Se o usuário estiver numa página restrita e deslogar, redireciona para o Início
             const paginaAtiva = document.querySelector('.pagina.ativa');
             if (paginaAtiva && (paginaAtiva.id === 'pag-cargos' || paginaAtiva.id === 'pag-armazenamento' || paginaAtiva.id === 'pag-banimento' || paginaAtiva.id === 'pag-configuracao')) {
                 irParaPagina('inicio');
