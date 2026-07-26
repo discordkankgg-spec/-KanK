@@ -350,7 +350,8 @@
     let banidos = JSON.parse(JSON.stringify(banidosPadrao));
     let midiasArmazenadas = [];
 
-    let usuarioAtual = null; 
+    // Recupera a sessão salva no navegador para evitar o deslog ao atualizar a página
+    let usuarioAtual = localStorage.getItem('kank_usuario_atual') || null; 
     let abaRanking = 'chamada';
 
     async function carregarDadosNuvem() {
@@ -457,6 +458,7 @@
         if (acessos[u] && acessos[u].senha === s) {
             if (erro) erro.style.display = 'none';
             usuarioAtual = u;
+            localStorage.setItem('kank_usuario_atual', u); // Salva sessão persistente
             window.exibirAvisoCustomizado(`✅ Bem-vindo(a), ${u}!`);
             atualizarInterface();
             if (buscar('campoUsuario')) buscar('campoUsuario').value = '';
@@ -468,6 +470,7 @@
 
     window.executarLogout = function() {
         usuarioAtual = null;
+        localStorage.removeItem('kank_usuario_atual'); // Remove sessão persistente
         atualizarInterface();
         window.irParaPagina('inicio');
     };
