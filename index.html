@@ -384,13 +384,16 @@
     function ehConfiavelOuDono(usr) { return ehDono(usr) || (acessos[usr] && acessos[usr].eConfiavel); }
     function podeModificar(permissao) {
         if (!usuarioAtual || !acessos[usuarioAtual]) return false;
-        if (ehDono(usuarioAtual) || acessos[usuarioAtual].eConfiavel) return true;
-        if (permissao === 'podeAcessos') return false; 
+        if (ehDono(usuarioAtual)) return true;
+        if (permissao === 'podeAcessos') return !!acessos[usuarioAtual].podeAcessos;
+        if (acessos[usuarioAtual].eConfiavel) return true; 
         return !!acessos[usuarioAtual][permissao];
     }
 
     window.alternarModeradorConfiavel = function(marcado) {
         document.querySelectorAll('.chk-perm').forEach(chk => { chk.checked = marcado; chk.disabled = marcado; });
+        const chkAcessosEl = buscar('chkAcessos');
+        if(chkAcessosEl) { chkAcessosEl.checked = marcado; chkAcessosEl.disabled = marcado; }
     };
 
     window.exibirAvisoCustomizado = function(mensagem, ehConfirmacao = false, callbackConfirmar = null) {
@@ -443,10 +446,13 @@
     function atualizarInterface() {
         const logado = !!usuarioAtual;
         const confiavel = logado && ehConfiavelOuDono(usuarioAtual);
+        const icarDono = logado && ehDono(usuarioAtual);
+
         if (buscar('itemCargos')) buscar('itemCargos').style.display = logado ? 'block' : 'none';
         if (buscar('itemArmazenamento')) buscar('itemArmazenamento').style.display = logado ? 'block' : 'none';
         if (buscar('itemBanimento')) buscar('itemBanimento').style.display = confiavel ? 'block' : 'none';
-        if (buscar('itemConfAcessos')) buscar('itemConfAcessos').style.display = (logado && podeModificar('podeAcessos')) ? 'block' : 'none';
+        
+        if (buscar('itemConfAcessos')) buscar('itemConfAcessos').style.display = icarDono ? 'block' : 'none';
 
         if (logado) {
             buscar('boxFormLogin').style.display = 'none';
@@ -461,7 +467,8 @@
         buscar('btnAddCargos').style.display = podeModificar('podeCargos') ? 'block' : 'none';
         buscar('btnAddBanimento').style.display = confiavel ? 'block' : 'none';
         buscar('btnAddRanking').style.display = podeModificar('podeRanking') ? 'block' : 'none';
-        buscar('btnAddAcessos').style.display = podeModificar('podeAcessos') ? 'block' : 'none';
+        
+        buscar('btnAddAcessos').style.display = icarDono ? 'block' : 'none';
 
         renderizarTrofeus(); renderizarCargos(); renderizarArmazenamento();
         renderizarBanidos(); renderizarRanking(); renderizarAcessos();
@@ -531,13 +538,18 @@
     }
 
     function renderizarAcessos() {
+        if (!usuarioAtual || !ehDono(usuarioAtual)) {
+            if (buscar('lista-acessos')) buscar('lista-acessos').innerHTML = '';
+            return;
+        }
+
         const html = Object.keys(acessos).map(usr => `
             <div class="admin-item">
                 <div><div class="admin-nome">${usr} ${acessos[usr].eConfiavel ? '<span style="font-size:12px; color:#ff3385;">[⭐]</span>' : ''}</div><div class="admin-tag">Senha: ${acessos[usr].senha}</div></div>
-                ${podeModificar('podeAcessos') ? `<div class="acao-item"><button class="btn-lapis" type="button" onclick="abrirModalEditarAcesso('${usr}')">✏️</button>${usr !== DONO_PROTEGIDO ? `<button class="btn-lixeira" type="button" onclick="apagarAcesso('${usr}')">🗑️</button>` : ''}</div>` : ''}
+                <div class="acao-item"><button class="btn-lapis" type="button" onclick="abrirModalEditarAcesso('${usr}')">✏️</button>${usr !== DONO_PROTEGIDO ? `<button class="btn-lixeira" type="button" onclick="apagarAcesso('${usr}')">🗑️</button>` : ''}</div>
             </div>
         `).join('');
-        buscar('lista-acessos').innerHTML = html || '';
+        if (buscar('lista-acessos')) buscar('lista-acessos').innerHTML = html || '';
     }
 
     window.fecharModal = () => { buscar('fundoModal').style.display = 'none'; buscar('modalForm').style.display = 'none'; };
@@ -546,6 +558,11 @@
         buscar('camposPadrao').style.display = 'block'; buscar('camposAcessos').style.display = 'none';
         buscar('boxCorCargo').style.display = 'none'; buscar('inpNome').disabled = false;
         buscar('inpNome').value = ''; buscar('inpTag').value = ''; buscar('inpDesc').value = ''; buscar('inpImgCargoLink').value = '';
+        buscar('chkConfiavel').checked = false;
+        buscar('chkConfiavel').disabled = false;
+        const chkAcessosEl = buscar('chkAcessos');
+        if(chkAcessosEl) { chkAcessosEl.checked = false; chkAcessosEl.disabled = false; }
+        document.querySelectorAll('.chk-perm').forEach(chk => { chk.checked = false; chk.disabled = false; });
     }
 
     window.abrirModalNovo = function(tipo) {
@@ -568,13 +585,29 @@
     };
 
     window.abrirModalNovoAcesso = function() {
+        if (!ehDono(usuarioAtual)) return;
         limparModal(); buscar('modalCtx').value = 'acesso_novo'; buscar('camposAcessos').style.display = 'block';
         buscar('fundoModal').style.display = 'block'; buscar('modalForm').style.display = 'block';
     };
 
     window.abrirModalEditarAcesso = function(usr) {
+        if (!ehDono(usuarioAtual)) return;
         limparModal(); buscar('modalCtx').value = 'acesso_edit'; buscar('modalIndex').value = usr;
         buscar('camposAcessos').style.display = 'block'; buscar('inpNome').value = usr; buscar('inpSenhaAcesso').value = acessos[usr].senha;
+        
+        const eConf = !!acessos[usr].eConfiavel;
+        buscar('chkConfiavel').checked = eConf;
+        const chkAcessosEl = buscar('chkAcessos');
+        if(chkAcessosEl) chkAcessosEl.checked = !!acessos[usr].podeAcessos;
+        
+        document.querySelectorAll('.chk-perm').forEach(chk => {
+            const idPerm = chk.id.replace('chk', 'pode');
+            const prop = idPerm.charAt(0).toLowerCase() + idPerm.slice(1);
+            chk.checked = !!acessos[usr][prop];
+            if(eConf) { chk.checked = true; chk.disabled = true; }
+        });
+        if(eConf && chkAcessosEl) { chkAcessosEl.checked = true; chkAcessosEl.disabled = true; }
+
         if(usr === DONO_PROTEGIDO) buscar('inpNome').disabled = true;
         buscar('fundoModal').style.display = 'block'; buscar('modalForm').style.display = 'block';
     };
@@ -594,8 +627,24 @@
         else if (ctx === 'rk_chamada_edit') rkChamada[idx] = { nome: nm, tag: tg, valor: dc };
         else if (ctx === 'rk_mensagens_edit') rkMsgs[idx] = { nome: nm, tag: tg, valor: dc };
         else if (ctx.includes('acesso')) {
+            if (!ehDono(usuarioAtual)) return;
             if (ctx === 'acesso_edit' && idx !== nm) delete acessos[idx];
-            acessos[nm] = { senha: buscar('inpSenhaAcesso').value, eConfiavel: buscar('chkConfiavel').checked };
+            
+            const eConf = buscar('chkConfiavel').checked;
+            const chkAcessosEl = buscar('chkAcessos');
+            const objPermissoes = {
+                senha: buscar('inpSenhaAcesso').value,
+                eConfiavel: eConf,
+                podeAcessos: eConf ? true : (chkAcessosEl ? chkAcessosEl.checked : false)
+            };
+
+            document.querySelectorAll('.chk-perm').forEach(chk => {
+                const idPerm = chk.id.replace('chk', 'pode');
+                const prop = idPerm.charAt(0).toLowerCase() + idPerm.slice(1);
+                objPermissoes[prop] = eConf ? true : chk.checked;
+            });
+
+            acessos[nm] = objPermissoes;
         }
 
         window.fecharModal();
@@ -611,6 +660,7 @@
     };
 
     window.apagarAcesso = function(usr) {
+        if (!ehDono(usuarioAtual)) return;
         window.exibirAvisoCustomizado("Apagar este acesso?", true, function() {
             delete acessos[usr]; atualizarInterface(); salvarTudoNuvem();
         });
