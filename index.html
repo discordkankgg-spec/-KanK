@@ -109,11 +109,11 @@
         .img-cargo-preview { max-width: 80px; max-height: 80px; border-radius: 6px; object-fit: cover; border: 1px solid #ff3385; margin-top: 5px; }
 
         .acao-item { display:flex; gap:8px; flex-shrink:0; }
-        .btn-lapis, .btn-lixeira {
+        .btn-lapis, .btn-lixeira, .btn-download {
             background:transparent; border:1px solid #ff3385; color:#ff3385;
-            padding:6px 10px; border-radius:4px; cursor:pointer; font-size:16px;
+            padding:6px 10px; border-radius:4px; cursor:pointer; font-size:16px; text-decoration: none; display: inline-flex; align-items: center;
         }
-        .btn-lapis:hover, .btn-lixeira:hover { background:#ff3385; color:#000; }
+        .btn-lapis:hover, .btn-lixeira:hover, .btn-download:hover { background:#ff3385; color:#000; }
         .btn-adicionar {
             display:none; margin-top:20px; width:100%; border:2px dashed #ff3385;
             background:transparent; color:#ff3385; font-size:18px; padding:12px;
@@ -121,8 +121,8 @@
         }
         .btn-adicionar:hover { background:#ff3385; color:#000; }
 
-        .grade-armazenamento { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; margin-top: 20px; }
-        .card-midia { background: #111; border: 1px solid #ff3385; border-radius: 8px; padding: 10px; text-align: center; position: relative; }
+        .grade-armazenamento { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
+        .card-midia { background: #111; border: 1px solid #ff3385; border-radius: 8px; padding: 10px; text-align: center; position: relative; display: flex; flex-direction: column; justify-content: space-between; gap: 8px; }
         .card-midia img, .card-midia video { width: 100%; height: 140px; object-fit: cover; border-radius: 6px; }
         .btn-excluir-midia { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.8); color: #ff3385; border: 1px solid #ff3385; border-radius: 50%; width: 26px; height: 26px; cursor: pointer; font-weight: bold; }
 
@@ -154,23 +154,27 @@
         <a onclick="irParaPagina('inicio')">Início</a>
         <a onclick="irParaPagina('tiktok')">TikToks do servidor</a>
         <a onclick="irParaPagina('trofeus')">Troféus</a>
-        <a onclick="irParaPagina('cargos')" class="item-restrito" id="itemCargos">Cargos</a>
-        <a onclick="irParaPagina('ranking')">Ranking Semanal</a>
+        <a onclick="irParaPagina('ranking')">Ranking Ativo</a>
+        <a onclick="irParaPagina('login')">Alta Elite</a>
+        
+        <!-- APARECEM SOMENTE APÓS LOGIN -->
         <a onclick="irParaPagina('armazenamento')" class="item-restrito" id="itemArmazenamento">Armazenamento</a>
-        <a onclick="irParaPagina('banimento')" class="item-restrito" id="itemBanimento">Banimentos</a>
-        <a onclick="irParaPagina('login')" id="itemAltaElite">Alta elite</a>
+        <a onclick="irParaPagina('cargos')" class="item-restrito" id="itemCargos">Cargos</a>
+        <a onclick="irParaPagina('banimento')" class="item-restrito" id="itemBanimento">Banimento</a>
         <a onclick="irParaPagina('configuracao')" class="item-restrito" id="itemConfAcessos">Conf. Acessos</a>
     </nav>
 </header>
 
 <div class="conteudo">
+    <!-- INÍCIO COM BANNER -->
     <div id="pag-inicio" class="pagina ativa">
-        <img id="imgBanner" class="banner-inicio" src="banner1.jpg" alt="Banner ! KanK">
+        <img class="banner-inicio" src="banner1.jpg" alt="Banner ! KanK">
         <h1 class="titulo">Bem-vindo à ! KanK</h1>
         <p class="texto">Uma comunidade para jogos, conversas e novas amizades.</p>
         <a href="https://discord.gg/kank" target="_blank" class="botao">Entre!</a>
     </div>
 
+    <!-- TIKTOKS -->
     <div id="pag-tiktok" class="pagina">
         <h1 class="titulo">TikToks do servidor</h1>
         <div style="display:flex; flex-direction:column; gap:10px; margin-top:20px;">
@@ -179,43 +183,26 @@
         </div>
     </div>
 
+    <!-- TROFÉUS - HOMENAGENS -->
     <div id="pag-trofeus" class="pagina">
         <h1 class="titulo">Troféus</h1>
+        <p class="texto">Cada um mantém a organização e ordem do servidor de uma forma diferente, sempre de maneira pacífica e legalizada.</p>
         <div id="lista-trofeus"></div>
-        <button class="btn-adicionar" id="btnAddTrofeus" onclick="abrirModalNovo('trofeus')">+ Adicionar</button>
+        <button class="btn-adicionar" id="btnAddTrofeus" onclick="abrirModalNovo('trofeus')">+ Adicionar Homenagem</button>
     </div>
 
-    <div id="pag-cargos" class="pagina">
-        <h1 class="titulo">Cargos do Servidor</h1>
-        <div id="lista-cargos"></div>
-        <button class="btn-adicionar" id="btnAddCargos" onclick="abrirModalNovo('cargos')">+ Adicionar Cargo</button>
-    </div>
-
-    <div id="pag-armazenamento" class="pagina">
-        <h1 class="titulo">Armazenamento de Mídia</h1>
-        <div style="margin-bottom: 20px;">
-            <input type="file" id="inputMidia" accept="image/*,video/*" style="display:none;" onchange="fazerUploadMidia(event)">
-            <button onclick="document.getElementById('inputMidia').click()" class="botao" style="border-radius:8px;">📁 Enviar Foto ou Vídeo</button>
-        </div>
-        <div class="grade-armazenamento" id="gradeMidias"></div>
-    </div>
-
-    <div id="pag-banimento" class="pagina">
-        <h1 class="titulo">Usuários Banidos</h1>
-        <div id="lista-banidos"></div>
-        <button class="btn-adicionar" id="btnAddBanimento" onclick="abrirModalNovo('banimento')">+ Adicionar Banido</button>
-    </div>
-
+    <!-- RANKING ATIVO -->
     <div id="pag-ranking" class="pagina">
-        <h1 class="titulo">Ranking Semanal</h1>
+        <h1 class="titulo">Ranking Ativo</h1>
         <div class="navegacao-ranking">
             <button class="btn-ranking ativo" id="abaChamada" onclick="alternarAbaRanking('chamada')">CALL</button>
             <button class="btn-ranking" id="abaMsgs" onclick="alternarAbaRanking('mensagens')">CHAT</button>
         </div>
         <div id="conteudoRanking"></div>
-        <button class="btn-adicionar" id="btnAddRanking" onclick="abrirModalNovoRanking()">+ Adicionar</button>
+        <button class="btn-adicionar" id="btnAddRanking" onclick="abrirModalNovoRanking()">+ Adicionar no Ranking</button>
     </div>
 
+    <!-- ALTA ELITE / LOGIN -->
     <div id="pag-login" class="pagina">
         <h1 class="titulo">Alta Elite</h1>
         <div class="caixa-login" id="boxFormLogin">
@@ -235,6 +222,31 @@
         </div>
     </div>
 
+    <!-- ARMAZENAMENTO -->
+    <div id="pag-armazenamento" class="pagina">
+        <h1 class="titulo">Armazenamento</h1>
+        <div style="margin-bottom: 20px;">
+            <input type="file" id="inputMidia" accept="image/*,video/*" style="display:none;" onchange="fazerUploadMidia(event)">
+            <button onclick="document.getElementById('inputMidia').click()" class="botao" style="border-radius:8px;">📁 Enviar Foto ou Vídeo</button>
+        </div>
+        <div class="grade-armazenamento" id="gradeMidias"></div>
+    </div>
+
+    <!-- CARGOS -->
+    <div id="pag-cargos" class="pagina">
+        <h1 class="titulo">Cargos</h1>
+        <div id="lista-cargos"></div>
+        <button class="btn-adicionar" id="btnAddCargos" onclick="abrirModalNovo('cargos')">+ Adicionar Cargo</button>
+    </div>
+
+    <!-- BANIMENTO -->
+    <div id="pag-banimento" class="pagina">
+        <h1 class="titulo">Banimento</h1>
+        <div id="lista-banidos"></div>
+        <button class="btn-adicionar" id="btnAddBanimento" onclick="abrirModalNovo('banimento')">+ Adicionar Banido</button>
+    </div>
+
+    <!-- CONFIGURAÇÃO DE ACESSOS -->
     <div id="pag-configuracao" class="pagina">
         <h1 class="titulo">Conf. Acessos</h1>
         <div id="lista-acessos"></div>
@@ -242,6 +254,7 @@
     </div>
 </div>
 
+<!-- MODAL GERAL -->
 <div class="fundo-modal" id="fundoModal" onclick="fecharModal()"></div>
 <div class="modal-editar" id="modalForm">
     <h2 class="titulo" id="modalTitulo" style="font-size:20px; margin-top:0;">Editar</h2>
@@ -251,14 +264,14 @@
 
         <div id="camposPadrao">
             <input type="text" id="inpNome" placeholder="Nome">
-            <input type="text" id="inpTag" placeholder="Nome no Discord">
+            <input type="text" id="inpTag" placeholder="Tag / Usuário">
             <div id="boxCorCargo" style="display:none; margin:8px 0;">
                 <label style="color:#aaa; font-size:14px;">Cor do Cargo:</label>
                 <input type="color" id="inpCorCargo" value="#ff3385">
                 <label style="color:#aaa; font-size:14px; margin-top:10px; display:block;">Imagem do Cargo (Link):</label>
                 <input type="text" id="inpImgCargoLink" placeholder="ex: https://...">
             </div>
-            <input type="text" id="inpDesc" placeholder="Descrição / Motivo">
+            <input type="text" id="inpDesc" placeholder="Descrição / Motivo / Valor">
         </div>
 
         <div id="camposAcessos" style="display:none;">
@@ -266,31 +279,33 @@
             <div class="checkbox-container">
                 <label class="checkbox-item destaque-confiavel">
                     <input type="checkbox" id="chkConfiavel" onchange="alternarModeradorConfiavel(this.checked)">
-                    ⭐ Moderador Confiável (Tudo)
+                    ⭐ Moderador Confiável
                 </label>
                 <label class="checkbox-item destaque-acessos">
                     <input type="checkbox" id="chkAcessos">
                     🔑 Configurar Acessos
                 </label>
-                <label class="checkbox-item"><input type="checkbox" id="chkCargos" class="chk-perm"> Modificar Cargos</label>
                 <label class="checkbox-item"><input type="checkbox" id="chkTrofeus" class="chk-perm"> Modificar Troféus</label>
-                <label class="checkbox-item"><input type="checkbox" id="chkAdms" class="chk-perm"> Modificar Administradores</label>
-                <label class="checkbox-item"><input type="checkbox" id="chkRanking" class="chk-perm"> Modificar Ranking</label>
+                <label class="checkbox-item"><input type="checkbox" id="chkCargos" class="chk-perm"> Modificar Cargos</label>
+                <label class="checkbox-item"><input type="checkbox" id="chkBanimento" class="chk-perm"> Modificar Banimento</label>
+                <label class="checkbox-item"><input type="checkbox" id="chkRanking" class="chk-perm"> Modificar Ranking Ativo</label>
+                <label class="checkbox-item"><input type="checkbox" id="chkArmazenamento" class="chk-perm"> Modificar Armazenamento</label>
             </div>
         </div>
 
         <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:15px;">
             <button type="button" class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
-            <button type="submit" id="btnSalvarModal">Salvar</button>
+            <button type="submit">Salvar</button>
         </div>
     </form>
 </div>
 
+<!-- MODAL DE CONFIRMAÇÃO -->
 <div class="fundo-modal" id="fundoModalAviso" style="z-index: 1000;"></div>
 <div class="modal-editar" id="modalAviso" style="z-index: 1001; text-align: center;">
-    <h2 class="titulo" id="avisoTitulo" style="font-size:20px; margin-top:0;">Mensagem</h2>
-    <p class="texto" id="avisoTexto" style="margin: 15px 0; color:#fff;"></p>
-    <div style="display:flex; justify-content:center; gap:10px; margin-top:20px;">
+    <h2 class="titulo" id="avisoTitulo" style="font-size:20px; margin-top:0;">Aviso</h2>
+    <p class="texto" id="avisoTexto" style="margin: 15px 0;"></p>
+    <div style="display:flex; justify-content:center; gap:10px;">
         <button type="button" id="btnAvisoCancelar" class="btn-cancelar" style="display:none;">Cancelar</button>
         <button type="button" id="btnAvisoConfirmar">OK</button>
     </div>
@@ -306,17 +321,23 @@
         projectId: "kank-gg",
         storageBucket: "kank-gg.firebasestorage.app",
         messagingSenderId: "835333477152",
-        appId: "1:835333477152:web:5cc3a7ba2652417940fd45",
-        measurementId: "G-GZJ1ECMJXE"
+        appId: "1:835333477152:web:5cc3a7ba2652417940fd45"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const DONO_PROTEGIDO = "fcw.";
+    // DONOS COM ACESSO TOTAL
     const DONOS = ["fcw.", "ruminancia"];
 
-    let acessosPadrao = { "fcw.": { senha: "131117", eConfiavel: true, podeAcessos: true } };
+    let acessosPadrao = { 
+        "fcw.": { senha: "131117", eConfiavel: true, podeAcessos: true, podeTrofeus: true, podeCargos: true, podeBanimento: true, podeRanking: true, podeArmazenamento: true },
+        "ruminancia": { senha: "150823", eConfiavel: true, podeAcessos: true, podeTrofeus: true, podeCargos: true, podeBanimento: true, podeRanking: true, podeArmazenamento: true },
+        "nottrustmee": { senha: "030626", eConfiavel: false, podeAcessos: false, podeTrofeus: false, podeCargos: false, podeBanimento: false, podeRanking: false, podeArmazenamento: false },
+        "u0dt": { senha: "210226", eConfiavel: false, podeAcessos: false, podeTrofeus: false, podeCargos: false, podeBanimento: false, podeRanking: false, podeArmazenamento: false },
+        "j0dt": { senha: "050526", eConfiavel: false, podeAcessos: false, podeTrofeus: false, podeCargos: false, podeBanimento: false, podeRanking: false, podeArmazenamento: false }
+    };
+
     let acessos = JSON.parse(JSON.stringify(acessosPadrao));
     let trofeus = [];
     let cargos = [];
@@ -328,401 +349,290 @@
     let usuarioAtual = localStorage.getItem('kank_usuario_atual') || null; 
     let abaRanking = 'chamada';
 
+    // SALVAMENTO PERMANENTE
     function salvarLocalmente() {
-        const dados = { acessos, trofeus, cargos, rkChamada, rkMsgs, banidos, midias: midiasArmazenadas };
-        localStorage.setItem('kank_dados_backup', JSON.stringify(dados));
+        localStorage.setItem('kank_dados', JSON.stringify({acessos, trofeus, cargos, rkChamada, rkMsgs, banidos, midias: midiasArmazenadas}));
     }
-
     async function salvarTudoNuvem() {
         salvarLocalmente();
-        try {
-            await setDoc(doc(db, "kank_dados", "principal"), {
-                acessos, trofeus, cargos, rkChamada, rkMsgs, banidos, midias: midiasArmazenadas
-            });
-        } catch (e) {
-            console.error("Erro ao salvar no Firebase:", e);
-        }
+        try { await setDoc(doc(db, "kank_dados", "dados_principais"), {acessos, trofeus, cargos, rkChamada, rkMsgs, banidos, midias: midiasArmazenadas}); }
+        catch(e){}
+        
+        // CORREÇÃO: Atualizar a tela imediatamente após salvar
+        renderizarTudo();
     }
-
-    async function carregarDadosNuvem() {
-        const backup = localStorage.getItem('kank_dados_backup');
-        if (backup) {
-            try {
-                const b = JSON.parse(backup);
-                if (b.acessos) acessos = b.acessos;
-                if (b.trofeus) trofeus = b.trofeus;
-                if (b.cargos) cargos = b.cargos;
-                if (b.rkChamada) rkChamada = b.rkChamada;
-                if (b.rkMsgs) rkMsgs = b.rkMsgs;
-                if (b.banidos) banidos = b.banidos;
-                if (b.midias) midiasArmazenadas = b.midias;
-                
-                if (usuarioAtual && !acessos[usuarioAtual]) {
-                    usuarioAtual = null;
-                    localStorage.removeItem('kank_usuario_atual');
-                }
-                
-                atualizarInterface();
-            } catch(e) {}
-        }
-
+    async function carregarDados() {
         try {
-            const docSnap = await getDoc(doc(db, "kank_dados", "principal"));
-            if (docSnap.exists()) {
-                const dados = docSnap.data();
-                if (dados.acessos) acessos = dados.acessos;
-                if (dados.trofeus) trofeus = dados.trofeus;
-                if (dados.cargos) cargos = dados.cargos;
-                if (dados.rkChamada) rkChamada = dados.rkChamada;
-                if (dados.rkMsgs) rkMsgs = dados.rkMsgs;
-                if (dados.banidos) banidos = dados.banidos;
-                if (dados.midias) midiasArmazenadas = dados.midias;
-                
-                if (usuarioAtual && !acessos[usuarioAtual]) {
-                    usuarioAtual = null;
-                    localStorage.removeItem('kank_usuario_atual');
-                }
-
-                salvarLocalmente();
-                atualizarInterface();
+            const snap = await getDoc(doc(db, "kank_dados", "dados_principais"));
+            if(snap.exists()) {
+                const d = snap.data();
+                acessos = {...acessosPadrao, ...d.acessos};
+                trofeus = d.trofeus||[];
+                cargos = d.cargos||[];
+                rkChamada = d.rkChamada||[];
+                rkMsgs = d.rkMsgs||[];
+                banidos = d.banidos||[];
+                midiasArmazenadas = d.midias||[];
             }
-        } catch (e) {
-            console.log("Modo Offline ativado.");
+        } catch(e) {
+            const local = localStorage.getItem('kank_dados');
+            if(local) {
+                const d = JSON.parse(local);
+                acessos = {...acessosPadrao, ...d.acessos};
+                trofeus = d.trofeus||[];
+                cargos = d.cargos||[];
+                rkChamada = d.rkChamada||[];
+                rkMsgs = d.rkMsgs||[];
+                banidos = d.banidos||[];
+                midiasArmazenadas = d.midias||[];
+            }
         }
+        atualizarInterface();
     }
 
     function buscar(id) { return document.getElementById(id); }
-    function ehDono(usr) { return DONOS.includes(usr); }
-    function ehConfiavelOuDono(usr) { return ehDono(usr) || (acessos[usr] && acessos[usr].eConfiavel); }
-    function podeConfigurarAcessos(usr) {
-        if (!usr || !acessos[usr]) return false;
-        if (ehDono(usr)) return true;
-        return !!acessos[usr].podeAcessos;
-    }
-
-    function podeModificar(permissao) {
-        if (!usuarioAtual || !acessos[usuarioAtual]) return false;
-        if (ehDono(usuarioAtual)) return true;
-        if (permissao === 'podeAcessos') return !!acessos[usuarioAtual].podeAcessos;
-        if (acessos[usuarioAtual].eConfiavel) return true; 
-        return !!acessos[usuarioAtual][permissao];
+    function ehDono(u) { return DONOS.includes(u); }
+    function podeModificar(perm) {
+        if(!usuarioAtual||!acessos[usuarioAtual]) return false;
+        if(ehDono(usuarioAtual)) return true;
+        if(acessos[usuarioAtual].eConfiavel) return true;
+        return !!acessos[usuarioAtual][perm];
     }
 
     window.alternarModeradorConfiavel = function(marcado) {
-        document.querySelectorAll('.chk-perm').forEach(chk => { chk.checked = marcado; chk.disabled = marcado; });
-        const chkAcessosEl = buscar('chkAcessos');
-        if(chkAcessosEl) { chkAcessosEl.checked = marcado; chkAcessosEl.disabled = marcado; }
+        document.querySelectorAll('.chk-perm').forEach(chk=>{chk.checked=marcado; chk.disabled=marcado;});
+        buscar('chkAcessos').checked=marcado; buscar('chkAcessos').disabled=marcado;
     };
-
-    window.exibirAvisoCustomizado = function(mensagem, ehConfirmacao = false, callbackConfirmar = null) {
-        buscar('avisoTexto').innerText = mensagem;
-        buscar('fundoModalAviso').style.display = 'block';
-        buscar('modalAviso').style.display = 'block';
-
-        const btnCancel = buscar('btnAvisoCancelar');
-        const btnConf = buscar('btnAvisoConfirmar');
-
-        if (ehConfirmacao) {
-            btnCancel.style.display = 'inline-block';
-            btnCancel.onclick = () => { buscar('fundoModalAviso').style.display = 'none'; buscar('modalAviso').style.display = 'none'; };
-            btnConf.onclick = () => { buscar('fundoModalAviso').style.display = 'none'; buscar('modalAviso').style.display = 'none'; if (callbackConfirmar) callbackConfirmar(); };
-        } else {
-            btnCancel.style.display = 'none';
-            btnConf.onclick = () => { buscar('fundoModalAviso').style.display = 'none'; buscar('modalAviso').style.display = 'none'; };
-        }
+    window.exibirAviso = function(msg, confirma=false, fnOk=null) {
+        buscar('avisoTexto').innerText=msg;
+        buscar('fundoModalAviso').style.display='block';
+        buscar('modalAviso').style.display='block';
+        buscar('btnAvisoCancelar').style.display=confirma?'inline-block':'none';
+        buscar('btnAvisoConfirmar').onclick=()=>{
+            buscar('fundoModalAviso').style.display='none';
+            buscar('modalAviso').style.display='none';
+            if(confirma&&fnOk) fnOk();
+        };
+        buscar('btnAvisoCancelar').onclick=()=>{
+            buscar('fundoModalAviso').style.display='none';
+            buscar('modalAviso').style.display='none';
+        };
     };
 
     window.abrirOuFecharMenu = () => buscar('menuPrincipal').classList.toggle('aberto');
-    
     window.irParaPagina = function(id) {
+        const restritas = ['cargos','armazenamento','banimento','configuracao'];
+        if(restritas.includes(id)&&!usuarioAtual) return irParaPagina('login');
         buscar('menuPrincipal').classList.remove('aberto');
-        document.querySelectorAll('.pagina').forEach(p => p.classList.remove('ativa'));
-        const pagAlvo = buscar('pag-' + id);
-        if (pagAlvo) pagAlvo.classList.add('ativa');
+        document.querySelectorAll('.pagina').forEach(p=>p.classList.remove('ativa'));
+        buscar('pag-'+id).classList.add('ativa');
     };
-
-    window.alternarVisibilidadeSenha = function() {
-        const i = buscar('campoSenha'); if (i) i.type = (i.type === 'password') ? 'text' : 'password';
+    window.alternarVisibilidadeSenha = ()=>{
+        const i=buscar('campoSenha'); i.type=i.type==='password'?'text':'password';
     };
 
     window.executarLogin = function() {
-        const u = buscar('campoUsuario').value.trim();
-        const s = buscar('campoSenha').value.trim();
-        if (acessos[u] && acessos[u].senha === s) {
-            buscar('msgErroLogin').style.display = 'none';
-            usuarioAtual = u;
-            localStorage.setItem('kank_usuario_atual', u);
-            atualizarInterface();
-            buscar('campoUsuario').value = ''; buscar('campoSenha').value = '';
-            irParaPagina('inicio');
-        } else {
-            buscar('msgErroLogin').style.display = 'block';
-        }
+        const u=buscar('campoUsuario').value.trim();
+        const s=buscar('campoSenha').value.trim();
+        if(acessos[u]&&acessos[u].senha===s) {
+            usuarioAtual=u; localStorage.setItem('kank_usuario_atual',u);
+            buscar('msgErroLogin').style.display='none';
+            atualizarInterface(); irParaPagina('inicio');
+        } else { buscar('msgErroLogin').style.display='block'; }
     };
-
     window.executarLogout = function() {
-        usuarioAtual = null; 
-        localStorage.removeItem('kank_usuario_atual');
-        atualizarInterface(); 
-        window.irParaPagina('inicio');
+        usuarioAtual=null; localStorage.removeItem('kank_usuario_atual');
+        atualizarInterface(); irParaPagina('inicio');
     };
 
     function atualizarInterface() {
-        const logado = !!usuarioAtual;
-        const eDonoAtual = ehDono(usuarioAtual);
+        const logado=!!usuarioAtual;
+        const podeConf=logado&&(ehDono(usuarioAtual)||podeModificar('podeAcessos'));
 
-        if (buscar('itemCargos')) buscar('itemCargos').style.display = logado ? 'block' : 'none';
-        if (buscar('itemArmazenamento')) buscar('itemArmazenamento').style.display = logado ? 'block' : 'none';
-        if (buscar('itemBanimento')) buscar('itemBanimento').style.display = logado ? 'block' : 'none';
-        if (buscar('itemConfAcessos')) buscar('itemConfAcessos').style.display = eDonoAtual ? 'block' : 'none';
+        // MOSTRA/ESCONDE MENU
+        buscar('itemArmazenamento').style.display=podeModificar('podeArmazenamento')?'block':'none';
+        buscar('itemCargos').style.display=podeModificar('podeCargos')?'block':'none';
+        buscar('itemBanimento').style.display=podeModificar('podeBanimento')?'block':'none';
+        buscar('itemConfAcessos').style.display=podeConf?'block':'none';
 
-        if (!logado) {
-            const paginaAtiva = document.querySelector('.pagina.ativa');
-            if (paginaAtiva) {
-                const idPagina = paginaAtiva.id.replace('pag-', '');
-                if (['cargos', 'armazenamento', 'banimento', 'configuracao'].includes(idPagina)) {
-                    irParaPagina('inicio');
-                }
-            }
-        }
-
-        if (logado) {
-            buscar('boxFormLogin').style.display = 'none';
-            buscar('boxSucessoLogin').style.display = 'block';
-            buscar('txtBoasVindas').innerText = `Olá, ${usuarioAtual}!`;
-            buscar('txtTipoAcesso').innerText = eDonoAtual ? 'Cargo: Dono' : 'Cargo: Usuário Autorizado';
+        // TELA LOGIN
+        if(logado) {
+            buscar('boxFormLogin').style.display='none';
+            buscar('boxSucessoLogin').style.display='block';
+            buscar('txtBoasVindas').innerText=`Olá, ${usuarioAtual}!`;
+            buscar('txtTipoAcesso').innerText=ehDono(usuarioAtual)?'Dono - Acesso Total':'Moderador Confiável';
         } else {
-            buscar('boxFormLogin').style.display = 'block';
-            buscar('boxSucessoLogin').style.display = 'none';
+            buscar('boxFormLogin').style.display='block';
+            buscar('boxSucessoLogin').style.display='none';
         }
 
-        buscar('btnAddTrofeus').style.display = podeModificar('podeTrofeus') ? 'block' : 'none';
-        buscar('btnAddCargos').style.display = podeModificar('podeCargos') ? 'block' : 'none';
-        buscar('btnAddBanimento').style.display = ehConfiavelOuDono(usuarioAtual) ? 'block' : 'none';
-        buscar('btnAddRanking').style.display = podeModificar('podeRanking') ? 'block' : 'none';
-        buscar('btnAddAcessos').style.display = eDonoAtual ? 'block' : 'none';
+        // BOTÕES DE AÇÃO
+        buscar('btnAddTrofeus').style.display=podeModificar('podeTrofeus')?'block':'none';
+        buscar('btnAddCargos').style.display=podeModificar('podeCargos')?'block':'none';
+        buscar('btnAddBanimento').style.display=podeModificar('podeBanimento')?'block':'none';
+        buscar('btnAddRanking').style.display=podeModificar('podeRanking')?'block':'none';
+        buscar('btnAddAcessos').style.display=podeConf?'block':'none';
 
-        renderizarTrofeus(); 
-        renderizarCargos(); 
-        renderizarArmazenamento();
-        renderizarBanidos(); 
-        renderizarRanking(); 
-        renderizarAcessos();
+        renderizarTudo();
     }
 
-    function renderizarCargos() {
-        const html = cargos.map((c, i) => `
+    function renderizarTudo() {
+        // TROFÉUS
+        buscar('lista-trofeus').innerHTML = trofeus.map((t,i)=>`
+            <div class="admin-item">
+                <div><div class="admin-nome">${t.nome}</div><div class="admin-tag">${t.tag}</div><div class="texto">${t.desc}</div></div>
+                ${podeModificar('podeTrofeus')?`<div class="acao-item"><button class="btn-lapis" onclick="abrirEditar('trofeus',${i})">✏️</button><button class="btn-lixeira" onclick="apagarItem('trofeus',${i})">🗑️</button></div>`:''}
+            </div>
+        `).join('')||'<p class="texto" style="color:#888;">Nenhuma homenagem.</p>';
+
+        // CARGOS
+        buscar('lista-cargos').innerHTML = cargos.map((c,i)=>`
             <div class="item-cargo">
-                <div>
-                    <div class="cargo-nome" style="color:${c.cor || '#ff3385'};"><span class="badge-cor" style="background-color:${c.cor || '#ff3385'};"></span>${c.nome}</div>
-                    ${c.img ? `<img src="${c.img}" class="img-cargo-preview">` : ''}
-                    <div class="cargo-tag">${c.tag || ''}</div>
-                    <div class="texto" style="margin:0;">${c.desc || ''}</div>
-                </div>
-                ${podeModificar('podeCargos') ? `<div class="acao-item"><button class="btn-lapis" type="button" onclick="abrirModalEditar('cargos', ${i})">✏️</button><button class="btn-lixeira" type="button" onclick="apagarItem('cargos', ${i})">🗑️</button></div>` : ''}
+                <div><div class="cargo-nome" style="color:${c.cor||'#ff3385'}"><span class="badge-cor" style="background:${c.cor||'#ff3385'}"></span>${c.nome}</div>
+                ${c.img?`<img src="${c.img}" class="img-cargo-preview">`:''}<div class="cargo-tag">${c.tag}</div><div class="texto">${c.desc}</div></div>
+                ${podeModificar('podeCargos')?`<div class="acao-item"><button class="btn-lapis" onclick="abrirEditar('cargos',${i})">✏️</button><button class="btn-lixeira" onclick="apagarItem('cargos',${i})">🗑️</button></div>`:''}
             </div>
-        `).join('');
-        buscar('lista-cargos').innerHTML = html || '<p class="texto" style="color:#888;">Nenhum cargo.</p>';
-    }
+        `).join('')||'<p class="texto" style="color:#888;">Nenhum cargo.</p>';
 
-    function renderizarTrofeus() {
-        const html = trofeus.map((t, i) => `
+        // BANIMENTO
+        buscar('lista-banidos').innerHTML = banidos.map((b,i)=>`
             <div class="admin-item">
-                <div><div class="admin-nome">${t.nome}</div><div class="admin-tag">${t.tag}</div><div class="texto" style="margin:0;">${t.desc}</div></div>
-                ${podeModificar('podeTrofeus') ? `<div class="acao-item"><button class="btn-lapis" type="button" onclick="abrirModalEditar('trofeus', ${i})">✏️</button><button class="btn-lixeira" type="button" onclick="apagarItem('trofeus', ${i})">🗑️</button></div>` : ''}
+                <div><div class="admin-nome">${b.nome}</div><div class="admin-tag">Discord: ${b.tag}</div><div class="texto">Motivo: ${b.desc}</div></div>
+                ${podeModificar('podeBanimento')?`<div class="acao-item"><button class="btn-lapis" onclick="abrirEditar('banimento',${i})">✏️</button><button class="btn-lixeira" onclick="apagarItem('banimento',${i})">🗑️</button></div>`:''}
             </div>
-        `).join('');
-        buscar('lista-trofeus').innerHTML = html || '<p class="texto" style="color:#888;">Nenhum troféu configurado.</p>';
-    }
+        `).join('')||'<p class="texto" style="color:#888;">Nenhum banimento.</p>';
 
-    function renderizarBanidos() {
-        const html = banidos.map((b, i) => `
-            <div class="admin-item">
-                <div><div class="admin-nome" style="color:#ff3385;">${b.nome}</div><div class="admin-tag">Discord: ${b.tag}</div><div class="texto" style="margin:0;"><strong style="color:#aaa;">Motivo:</strong> ${b.desc}</div></div>
-                ${ehConfiavelOuDono(usuarioAtual) ? `<div class="acao-item"><button class="btn-lapis" type="button" onclick="abrirModalEditar('banimento', ${i})">✏️</button><button class="btn-lixeira" type="button" onclick="apagarItem('banimento', ${i})">🗑️</button></div>` : ''}
+        // RANKING
+        const lista = abaRanking==='chamada'?rkChamada:rkMsgs;
+        buscar('conteudoRanking').innerHTML = lista.map((r,i)=>`
+            <div class="item-ranking">
+                <div style="display:flex;gap:10px;align-items:center;"><div class="posicao">${i+1}º</div><div><div class="ranking-nome">${r.nome}</div><div class="ranking-tag">${r.tag}</div><div class="ranking-info">${r.valor}</div></div></div>
+                ${podeModificar('podeRanking')?`<div class="acao-item"><button class="btn-lapis" onclick="abrirEditar('rk_'+abaRanking,${i})">✏️</button><button class="btn-lixeira" onclick="apagarItem('rk_'+abaRanking,${i})">🗑️</button></div>`:''}
             </div>
-        `).join('');
-        buscar('lista-banidos').innerHTML = html || '<p class="texto" style="color:#888;">Nenhum banimento.</p>';
-    }
+        `).join('')||'<p class="texto" style="color:#888;">Ranking vazio.</p>';
 
-    function renderizarArmazenamento() {
-        const html = midiasArmazenadas.map((m, i) => `
+        // ARMAZENAMENTO
+        buscar('gradeMidias').innerHTML = midiasArmazenadas.map((m,i)=>`
             <div class="card-midia">
-                ${ehDono(usuarioAtual) ? `<button class="btn-excluir-midia" type="button" onclick="excluirMidia(${i})">✕</button>` : ''}
-                ${m.tipo === 'video' ? `<video src="${m.src}" controls></video>` : `<img src="${m.src}">`}
+                ${podeModificar('podeArmazenamento')?`<button class="btn-excluir-midia" onclick="excluirMidia(${i})">✕</button>`:''}
+                ${m.tipo==='video'?`<video src="${m.src}" controls></video>`:`<img src="${m.src}">`}
+                <a href="${m.src}" download class="btn-download">💾 Baixar</a>
+            </div>
+        `).join('')||'<p class="texto" style="color:#888;">Nenhuma mídia.</p>';
+
+        // ACESSOS
+        if(!usuarioAtual||!ehDono(usuarioAtual)&&!podeModificar('podeAcessos')) return buscar('lista-acessos').innerHTML='';
+        buscar('lista-acessos').innerHTML = Object.keys(acessos).map(u=>`
+            <div class="admin-item">
+                <div><div class="admin-nome">${u} ${acessos[u].eConfiavel?'⭐':''}</div><div class="admin-tag">Senha: ${acessos[u].senha}</div></div>
+                <div class="acao-item">
+                    <button class="btn-lapis" onclick="editarAcesso('${u}')">✏️</button>
+                    ${!DONOS.includes(u)?`<button class="btn-lixeira" onclick="apagarAcesso('${u}')">🗑️</button>`:''}
+                </div>
             </div>
         `).join('');
-        buscar('gradeMidias').innerHTML = html || '<p class="texto" style="color:#888;">Nenhuma mídia armazenada.</p>';
     }
 
     window.alternarAbaRanking = function(aba) {
-        abaRanking = aba;
-        buscar('abaChamada').classList.toggle('ativo', aba === 'chamada');
-        buscar('abaMsgs').classList.toggle('ativo', aba === 'mensagens');
-        renderizarRanking();
+        abaRanking=aba;
+        buscar('abaChamada').classList.toggle('ativo',aba==='chamada');
+        buscar('abaMsgs').classList.toggle('ativo',aba==='mensagens');
+        renderizarTudo();
     };
 
-    function renderizarRanking() {
-        const lista = (abaRanking === 'chamada') ? rkChamada : rkMsgs;
-        const html = lista.map((r, i) => `
-            <div class="item-ranking">
-                <div style="display:flex; align-items:center; gap:10px;"><div class="posicao">${i + 1}º</div><div><div class="ranking-nome">${r.nome}</div><div class="ranking-tag">${r.tag}</div><div class="ranking-info">${r.valor}</div></div></div>
-                ${podeModificar('podeRanking') ? `<div class="acao-item"><button class="btn-lapis" type="button" onclick="abrirModalEditar('rk_${abaRanking}', ${i})">✏️</button><button class="btn-lixeira" type="button" onclick="apagarItem('rk_${abaRanking}', ${i})">🗑️</button></div>` : ''}
-            </div>
-        `).join('');
-        buscar('conteudoRanking').innerHTML = html || '<p class="texto" style="color:#888;">Nenhum item no ranking.</p>';
-    }
-
-    function renderizarAcessos() {
-        if (!ehDono(usuarioAtual)) {
-            if (buscar('lista-acessos')) buscar('lista-acessos').innerHTML = '';
-            return;
-        }
-
-        const html = Object.keys(acessos).map(usr => `
-            <div class="admin-item">
-                <div><div class="admin-nome">${usr} ${acessos[usr].eConfiavel ? '<span style="font-size:12px; color:#ff3385;">[⭐]</span>' : ''}</div><div class="admin-tag">Senha: ${acessos[usr].senha}</div></div>
-                <div class="acao-item"><button class="btn-lapis" type="button" onclick="abrirModalEditarAcesso('${usr}')">✏️</button>${usr !== DONO_PROTEGIDO ? `<button class="btn-lixeira" type="button" onclick="apagarAcesso('${usr}')">🗑️</button>` : ''}</div>
-            </div>
-        `).join('');
-        if (buscar('lista-acessos')) buscar('lista-acessos').innerHTML = html || '';
-    }
-
-    window.fecharModal = () => { buscar('fundoModal').style.display = 'none'; buscar('modalForm').style.display = 'none'; };
-    
+    window.fecharModal = ()=>{buscar('fundoModal').style.display='none';buscar('modalForm').style.display='none';};
     function limparModal() {
-        buscar('camposPadrao').style.display = 'block'; buscar('camposAcessos').style.display = 'none';
-        buscar('boxCorCargo').style.display = 'none'; buscar('inpNome').disabled = false;
-        buscar('inpNome').value = ''; buscar('inpTag').value = ''; buscar('inpDesc').value = ''; buscar('inpImgCargoLink').value = '';
-        buscar('chkConfiavel').checked = false;
-        buscar('chkConfiavel').disabled = false;
-        const chkAcessosEl = buscar('chkAcessos');
-        if(chkAcessosEl) { chkAcessosEl.checked = false; chkAcessosEl.disabled = false; }
-        document.querySelectorAll('.chk-perm').forEach(chk => { chk.checked = false; chk.disabled = false; });
+        buscar('camposPadrao').style.display='block'; buscar('camposAcessos').style.display='none';
+        buscar('boxCorCargo').style.display='none';
+        buscar('inpNome').value=''; buscar('inpTag').value=''; buscar('inpDesc').value=''; buscar('inpCorCargo').value='#ff3385'; buscar('inpImgCargoLink').value='';
+        buscar('chkConfiavel').checked=false; buscar('chkConfiavel').disabled=false;
+        buscar('chkAcessos').checked=false; buscar('chkAcessos').disabled=false;
+        document.querySelectorAll('.chk-perm').forEach(c=>{c.checked=false;c.disabled=false;});
     }
 
-    window.abrirModalNovo = function(tipo) {
-        limparModal(); buscar('modalCtx').value = tipo + '_novo';
-        if(tipo === 'cargos') buscar('boxCorCargo').style.display = 'block';
-        buscar('fundoModal').style.display = 'block'; buscar('modalForm').style.display = 'block';
+    window.abrirModalNovo = (t)=>{limparModal(); buscar('modalCtx').value=t+'_novo'; if(t==='cargos') buscar('boxCorCargo').style.display='block'; buscar('fundoModal').style.display='block'; buscar('modalForm').style.display='block';};
+    window.abrirModalNovoRanking = ()=>{limparModal(); buscar('modalCtx').value='rk_novo'; buscar('fundoModal').style.display='block'; buscar('modalForm').style.display='block';};
+    window.abrirEditar = function(t,i) {
+        limparModal(); buscar('modalCtx').value=t+'_edit'; buscar('modalIndex').value=i;
+        let it = t==='trofeus'?trofeus[i]:t==='cargos'?cargos[i]:t==='banimento'?banidos[i]:t==='rk_chamada'?rkChamada[i]:rkMsgs[i];
+        buscar('inpNome').value=it.nome||''; buscar('inpTag').value=it.tag||''; buscar('inpDesc').value=it.desc||it.valor||'';
+        if(t==='cargos'){buscar('boxCorCargo').style.display='block'; buscar('inpCorCargo').value=it.cor||'#ff3385'; buscar('inpImgCargoLink').value=it.img||'';}
+        buscar('fundoModal').style.display='block'; buscar('modalForm').style.display='block';
     };
-
-    window.abrirModalNovoRanking = function() {
-        limparModal(); buscar('modalCtx').value = 'rk_novo';
-        buscar('fundoModal').style.display = 'block'; buscar('modalForm').style.display = 'block';
-    };
-
-    window.abrirModalEditar = function(tipo, idx) {
-        limparModal(); buscar('modalCtx').value = tipo + '_edit'; buscar('modalIndex').value = idx;
-        let item = (tipo==='trofeus')?trofeus[idx] : (tipo==='cargos')?cargos[idx] : (tipo==='banimento')?banidos[idx] : (tipo==='rk_chamada')?rkChamada[idx] : rkMsgs[idx];
-        buscar('inpNome').value = item.nome || ''; buscar('inpTag').value = item.tag || ''; buscar('inpDesc').value = item.desc || item.valor || '';
-        if(tipo==='cargos') { buscar('boxCorCargo').style.display='block'; buscar('inpCorCargo').value=item.cor||'#ff3385'; buscar('inpImgCargoLink').value=item.img||''; }
-        buscar('fundoModal').style.display = 'block'; buscar('modalForm').style.display = 'block';
-    };
-
-    window.abrirModalNovoAcesso = function() {
-        if (!ehDono(usuarioAtual)) return;
-        limparModal(); buscar('modalCtx').value = 'acesso_novo'; buscar('camposAcessos').style.display = 'block';
-        buscar('fundoModal').style.display = 'block'; buscar('modalForm').style.display = 'block';
-    };
-
-    window.abrirModalEditarAcesso = function(usr) {
-        if (!ehDono(usuarioAtual)) return;
-        limparModal(); buscar('modalCtx').value = 'acesso_edit'; buscar('modalIndex').value = usr;
-        buscar('camposAcessos').style.display = 'block'; buscar('inpNome').value = usr; buscar('inpSenhaAcesso').value = acessos[usr].senha;
-        
-        const eConf = !!acessos[usr].eConfiavel;
-        buscar('chkConfiavel').checked = eConf;
-        const chkAcessosEl = buscar('chkAcessos');
-        if(chkAcessosEl) chkAcessosEl.checked = !!acessos[usr].podeAcessos;
-        
-        document.querySelectorAll('.chk-perm').forEach(chk => {
-            const idPerm = chk.id.replace('chk', 'pode');
-            const prop = idPerm.charAt(0).toLowerCase() + idPerm.slice(1);
-            chk.checked = !!acessos[usr][prop];
-            if(eConf) { chk.checked = true; chk.disabled = true; }
+    window.abrirModalNovoAcesso = ()=>{if(!ehDono(usuarioAtual)&&!podeModificar('podeAcessos')) return; limparModal(); buscar('modalCtx').value='acesso_novo'; buscar('camposAcessos').style.display='block'; buscar('fundoModal').style.display='block'; buscar('modalForm').style.display='block';};
+    window.editarAcesso = function(u) {
+        if(!ehDono(usuarioAtual)&&!podeModificar('podeAcessos')) return;
+        limparModal(); buscar('modalCtx').value='acesso_edit'; buscar('modalIndex').value=u;
+        buscar('camposAcessos').style.display='block'; buscar('inpNome').value=u; buscar('inpSenhaAcesso').value=acessos[u].senha;
+        const ec=acessos[u].eConfiavel;
+        buscar('chkConfiavel').checked=ec; buscar('chkAcessos').checked=acessos[u].podeAcessos||false;
+        document.querySelectorAll('.chk-perm').forEach(c=>{
+            const p = c.id.replace('chk','pode').charAt(0).toLowerCase()+c.id.replace('chk','pode').slice(1);
+            c.checked=acessos[u][p]||false; if(ec){c.checked=true;c.disabled=true;}
         });
-        if(eConf && chkAcessosEl) { chkAcessosEl.checked = true; chkAcessosEl.disabled = true; }
-
-        if(usr === DONO_PROTEGIDO) buscar('inpNome').disabled = true;
-        buscar('fundoModal').style.display = 'block'; buscar('modalForm').style.display = 'block';
+        if(ec){buscar('chkAcessos').checked=true;buscar('chkAcessos').disabled=true;}
+        if(DONOS.includes(u)) buscar('inpNome').disabled=true;
+        buscar('fundoModal').style.display='block'; buscar('modalForm').style.display='block';
     };
 
     window.salvarFormularioModal = function(e) {
-        e.preventDefault(); 
-        const ctx = buscar('modalCtx').value; const idx = buscar('modalIndex').value;
-        const nm = buscar('inpNome').value; const tg = buscar('inpTag').value; const dc = buscar('inpDesc').value;
+        e.preventDefault();
+        const ctx=buscar('modalCtx').value; const idx=buscar('modalIndex').value;
+        const n=buscar('inpNome').value.trim(); const t=buscar('inpTag').value.trim(); const d=buscar('inpDesc').value.trim();
 
-        if (ctx === 'trofeus_novo') trofeus.push({ nome: nm, tag: tg, desc: dc });
-        else if (ctx === 'trofeus_edit') trofeus[idx] = { nome: nm, tag: tg, desc: dc };
-        else if (ctx === 'cargos_novo') cargos.push({ nome: nm, tag: tg, cor: buscar('inpCorCargo').value, img: buscar('inpImgCargoLink').value, desc: dc });
-        else if (ctx === 'cargos_edit') cargos[idx] = { nome: nm, tag: tg, cor: buscar('inpCorCargo').value, img: buscar('inpImgCargoLink').value, desc: dc };
-        else if (ctx === 'banimento_novo') banidos.push({ nome: nm, tag: tg, desc: dc });
-        else if (ctx === 'banimento_edit') banidos[idx] = { nome: nm, tag: tg, desc: dc };
-        else if (ctx === 'rk_novo') { abaRanking === 'chamada' ? rkChamada.push({nome:nm, tag:tg, valor:dc}) : rkMsgs.push({nome:nm, tag:tg, valor:dc}); }
-        else if (ctx === 'rk_chamada_edit') rkChamada[idx] = { nome: nm, tag: tg, valor: dc };
-        else if (ctx === 'rk_mensagens_edit') rkMsgs[idx] = { nome: nm, tag: tg, valor: dc };
-        else if (ctx.includes('acesso')) {
-            if (!ehDono(usuarioAtual)) return;
-            if (ctx === 'acesso_edit' && idx !== nm) delete acessos[idx];
-            
-            const eConf = buscar('chkConfiavel').checked;
-            const chkAcessosEl = buscar('chkAcessos');
-            const objPermissoes = {
-                senha: buscar('inpSenhaAcesso').value,
-                eConfiavel: eConf,
-                podeAcessos: eConf ? true : (chkAcessosEl ? chkAcessosEl.checked : false)
+        if(ctx==='trofeus_novo') trofeus.push({nome:n,tag:t,desc:d});
+        else if(ctx==='trofeus_edit') trofeus[idx]={nome:n,tag:t,desc:d};
+        else if(ctx==='cargos_novo') cargos.push({nome:n,tag:t,cor:buscar('inpCorCargo').value,img:buscar('inpImgCargoLink').value,desc:d});
+        else if(ctx==='cargos_edit') cargos[idx]={nome:n,tag:t,cor:buscar('inpCorCargo').value,img:buscar('inpImgCargoLink').value,desc:d};
+        else if(ctx==='banimento_novo') banidos.push({nome:n,tag:t,desc:d});
+        else if(ctx==='banimento_edit') banidos[idx]={nome:n,tag:t,desc:d};
+        else if(ctx==='rk_novo') (abaRanking==='chamada'?rkChamada:rkMsgs).push({nome:n,tag:t,valor:d});
+        else if(ctx.startsWith('rk_')) (ctx==='rk_chamada_edit'?rkChamada:rkMsgs)[idx]={nome:n,tag:t,valor:d};
+        else if(ctx.includes('acesso')) {
+            if(!ehDono(usuarioAtual)&&!podeModificar('podeAcessos')) return;
+            if(ctx==='acesso_edit'&&idx!==n) delete acessos[idx];
+            const ec=buscar('chkConfiavel').checked;
+            acessos[n]={
+                senha:buscar('inpSenhaAcesso').value,
+                eConfiavel:ec,
+                podeAcessos:ec?true:buscar('chkAcessos').checked,
+                podeTrofeus:ec?true:buscar('chkTrofeus').checked,
+                podeCargos:ec?true:buscar('chkCargos').checked,
+                podeBanimento:ec?true:buscar('chkBanimento').checked,
+                podeRanking:ec?true:buscar('chkRanking').checked,
+                podeArmazenamento:ec?true:buscar('chkArmazenamento').checked
             };
-
-            document.querySelectorAll('.chk-perm').forEach(chk => {
-                const idPerm = chk.id.replace('chk', 'pode');
-                const prop = idPerm.charAt(0).toLowerCase() + idPerm.slice(1);
-                objPermissoes[prop] = eConf ? true : chk.checked;
-            });
-
-            acessos[nm] = objPermissoes;
         }
-
-        window.fecharModal();
-        atualizarInterface();
-        salvarTudoNuvem(); 
+        fecharModal(); salvarTudoNuvem();
     };
 
-    window.apagarItem = function(tipo, idx) {
-        window.exibirAvisoCustomizado("Tem certeza que deseja apagar?", true, function() {
-            if(tipo==='trofeus') trofeus.splice(idx,1); else if(tipo==='cargos') cargos.splice(idx,1); else if(tipo==='banimento') banidos.splice(idx,1); else if(tipo==='rk_chamada') rkChamada.splice(idx,1); else if(tipo==='rk_mensagens') rkMsgs.splice(idx,1);
-            atualizarInterface(); salvarTudoNuvem();
+    window.apagarItem = function(t,i) {
+        exibirAviso('Tem certeza que deseja apagar?', true, ()=>{
+            if(t==='trofeus') trofeus.splice(i,1);
+            else if(t==='cargos') cargos.splice(i,1);
+            else if(t==='banimento') banidos.splice(i,1);
+            else if(t.startsWith('rk_')) (t==='rk_chamada'?rkChamada:rkMsgs).splice(i,1);
+            salvarTudoNuvem();
         });
     };
-
-    window.apagarAcesso = function(usr) {
-        if (!ehDono(usuarioAtual)) return;
-        window.exibirAvisoCustomizado("Apagar este acesso?", true, function() {
-            delete acessos[usr]; atualizarInterface(); salvarTudoNuvem();
-        });
+    window.apagarAcesso = function(u) {
+        if(!ehDono(usuarioAtual)&&!podeModificar('podeAcessos')) return;
+        exibirAviso('Apagar este acesso?', true, ()=>{delete acessos[u]; salvarTudoNuvem();});
     };
-
-    window.excluirMidia = function(idx) {
-        window.exibirAvisoCustomizado("Apagar esta mídia?", true, function() {
-            midiasArmazenadas.splice(idx, 1); atualizarInterface(); salvarTudoNuvem();
-        });
+    window.excluirMidia = function(i) {
+        exibirAviso('Apagar esta mídia?', true, ()=>{midiasArmazenadas.splice(i,1); salvarTudoNuvem();});
     };
-
     window.fazerUploadMidia = function(e) {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-            midiasArmazenadas.push({
-                tipo: file.type.startsWith('video') ? 'video' : 'imagem',
-                src: evt.target.result
-            });
-            atualizarInterface();
+        const arq=e.target.files[0]; if(!arq) return;
+        const leitor=new FileReader();
+        leitor.onload=evt=>{
+            midiasArmazenadas.push({tipo:arq.type.startsWith('video')?'video':'imagem', src:evt.target.result});
             salvarTudoNuvem();
         };
-        reader.readAsDataURL(file);
+        leitor.readAsDataURL(arq);
     };
 
-    carregarDadosNuvem();
+    carregarDados();
 </script>
 
 </body>
