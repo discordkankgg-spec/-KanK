@@ -350,7 +350,6 @@
     let banidos = JSON.parse(JSON.stringify(banidosPadrao));
     let midiasArmazenadas = [];
 
-    // Recupera a sessão salva no navegador para evitar o deslog ao atualizar a página
     let usuarioAtual = localStorage.getItem('kank_usuario_atual') || null; 
     let abaRanking = 'chamada';
 
@@ -458,7 +457,7 @@
         if (acessos[u] && acessos[u].senha === s) {
             if (erro) erro.style.display = 'none';
             usuarioAtual = u;
-            localStorage.setItem('kank_usuario_atual', u); // Salva sessão persistente
+            localStorage.setItem('kank_usuario_atual', u);
             window.exibirAvisoCustomizado(`✅ Bem-vindo(a), ${u}!`);
             atualizarInterface();
             if (buscar('campoUsuario')) buscar('campoUsuario').value = '';
@@ -470,7 +469,7 @@
 
     window.executarLogout = function() {
         usuarioAtual = null;
-        localStorage.removeItem('kank_usuario_atual'); // Remove sessão persistente
+        localStorage.removeItem('kank_usuario_atual');
         atualizarInterface();
         window.irParaPagina('inicio');
     };
@@ -721,8 +720,6 @@
     };
 
     window.abrirModalNovo = function(tipo) {
-        if (tipo === 'banimento' && !ehConfiavelOuDono(usuarioAtual)) return;
-        if (tipo !== 'banimento' && !podeModificar('pode' + tipo.charAt(0).toUpperCase() + tipo.slice(1))) return;
         limparModal();
         if (buscar('modalTitulo')) buscar('modalTitulo').innerText = 'Adicionar Item';
         if (buscar('modalCtx')) buscar('modalCtx').value = tipo + '_novo';
@@ -738,7 +735,6 @@
     };
 
     window.abrirModalNovoRanking = function() {
-        if (!podeModificar('podeRanking')) return;
         limparModal();
         if (buscar('modalTitulo')) buscar('modalTitulo').innerText = 'Adicionar Posição';
         if (buscar('modalCtx')) buscar('modalCtx').value = 'rk_novo';
@@ -776,7 +772,6 @@
     };
 
     window.abrirModalNovoAcesso = function() {
-        if (!podeModificar('podeAcessos')) return;
         limparModal();
         if (buscar('modalTitulo')) buscar('modalTitulo').innerText = 'Cadastrar Acesso';
         if (buscar('modalCtx')) buscar('modalCtx').value = 'acesso_novo';
@@ -787,7 +782,6 @@
     };
 
     window.abrirModalEditarAcesso = function(usr) {
-        if (!podeModificar('podeAcessos')) return;
         limparModal();
         const a = acessos[usr];
         if (!a) return;
