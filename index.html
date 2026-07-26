@@ -316,12 +316,13 @@
     import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
-        apiKey: "AIzaSyCQyF3eVfOkLHyRq65J-Xk_N097C4-e6k4",
-        authDomain: "kank-gg.firebaseapp.com",
-        projectId: "kank-gg",
-        storageBucket: "kank-gg.firebasestorage.app",
-        messagingSenderId: "835333477152",
-        appId: "1:835333477152:web:5cc3a7ba2652417940fd45"
+      apiKey: "AIzaSyCQyF3eVfOkLHyRq65J-Xk_N097C4-e6k4",
+      authDomain: "kank-gg.firebaseapp.com",
+      projectId: "kank-gg",
+      storageBucket: "kank-gg.firebasestorage.app",
+      messagingSenderId: "835333477152",
+      appId: "1:835333477152:web:5cc3a7ba2652417940fd45",
+      measurementId: "G-NWLEEKW7KS"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -358,7 +359,6 @@
         try { await setDoc(doc(db, "kank_dados", "dados_principais"), {acessos, trofeus, cargos, rkChamada, rkMsgs, banidos, midias: midiasArmazenadas}); }
         catch(e){}
         
-        // CORREÇÃO: Atualizar a tela imediatamente após salvar
         renderizarTudo();
     }
     async function carregarDados() {
@@ -449,13 +449,11 @@
         const logado=!!usuarioAtual;
         const podeConf=logado&&(ehDono(usuarioAtual)||podeModificar('podeAcessos'));
 
-        // MOSTRA/ESCONDE MENU
         buscar('itemArmazenamento').style.display=podeModificar('podeArmazenamento')?'block':'none';
         buscar('itemCargos').style.display=podeModificar('podeCargos')?'block':'none';
         buscar('itemBanimento').style.display=podeModificar('podeBanimento')?'block':'none';
         buscar('itemConfAcessos').style.display=podeConf?'block':'none';
 
-        // TELA LOGIN
         if(logado) {
             buscar('boxFormLogin').style.display='none';
             buscar('boxSucessoLogin').style.display='block';
@@ -466,7 +464,6 @@
             buscar('boxSucessoLogin').style.display='none';
         }
 
-        // BOTÕES DE AÇÃO
         buscar('btnAddTrofeus').style.display=podeModificar('podeTrofeus')?'block':'none';
         buscar('btnAddCargos').style.display=podeModificar('podeCargos')?'block':'none';
         buscar('btnAddBanimento').style.display=podeModificar('podeBanimento')?'block':'none';
@@ -477,7 +474,6 @@
     }
 
     function renderizarTudo() {
-        // TROFÉUS
         buscar('lista-trofeus').innerHTML = trofeus.map((t,i)=>`
             <div class="admin-item">
                 <div><div class="admin-nome">${t.nome}</div><div class="admin-tag">${t.tag}</div><div class="texto">${t.desc}</div></div>
@@ -485,7 +481,6 @@
             </div>
         `).join('')||'<p class="texto" style="color:#888;">Nenhuma homenagem.</p>';
 
-        // CARGOS
         buscar('lista-cargos').innerHTML = cargos.map((c,i)=>`
             <div class="item-cargo">
                 <div><div class="cargo-nome" style="color:${c.cor||'#ff3385'}"><span class="badge-cor" style="background:${c.cor||'#ff3385'}"></span>${c.nome}</div>
@@ -494,7 +489,6 @@
             </div>
         `).join('')||'<p class="texto" style="color:#888;">Nenhum cargo.</p>';
 
-        // BANIMENTO
         buscar('lista-banidos').innerHTML = banidos.map((b,i)=>`
             <div class="admin-item">
                 <div><div class="admin-nome">${b.nome}</div><div class="admin-tag">Discord: ${b.tag}</div><div class="texto">Motivo: ${b.desc}</div></div>
@@ -502,7 +496,6 @@
             </div>
         `).join('')||'<p class="texto" style="color:#888;">Nenhum banimento.</p>';
 
-        // RANKING
         const lista = abaRanking==='chamada'?rkChamada:rkMsgs;
         buscar('conteudoRanking').innerHTML = lista.map((r,i)=>`
             <div class="item-ranking">
@@ -511,7 +504,6 @@
             </div>
         `).join('')||'<p class="texto" style="color:#888;">Ranking vazio.</p>';
 
-        // ARMAZENAMENTO
         buscar('gradeMidias').innerHTML = midiasArmazenadas.map((m,i)=>`
             <div class="card-midia">
                 ${podeModificar('podeArmazenamento')?`<button class="btn-excluir-midia" onclick="excluirMidia(${i})">✕</button>`:''}
@@ -520,7 +512,6 @@
             </div>
         `).join('')||'<p class="texto" style="color:#888;">Nenhuma mídia.</p>';
 
-        // ACESSOS
         if(!usuarioAtual||!ehDono(usuarioAtual)&&!podeModificar('podeAcessos')) return buscar('lista-acessos').innerHTML='';
         buscar('lista-acessos').innerHTML = Object.keys(acessos).map(u=>`
             <div class="admin-item">
