@@ -42,7 +42,6 @@
         .conteudo { padding: 20px; max-width: 900px; margin: 0 auto; position: relative; }
         .texto { line-height: 1.6; margin-bottom: 15px; }
 
-        /* Banner de Entrada com o nome banner1.jpg */
         .banner-inicio {
             width: 100%;
             max-height: 380px;
@@ -144,8 +143,6 @@
         .checkbox-item input { width: auto; margin: 0; cursor: pointer; }
         .destaque-confiavel { color: #ff3385; font-weight: bold; }
         .destaque-acessos { color: #ffcc00; font-weight: bold; border-bottom: 1px dashed #ff3385; padding-bottom: 8px; margin-bottom: 5px; }
-        
-        .caixa-backup { margin-top: 15px; border-top: 1px dashed #ff3385; padding-top: 15px; display: none; }
     </style>
 </head>
 <body>
@@ -166,16 +163,13 @@
 </header>
 
 <div class="conteudo">
-    <!-- INÍCIO -->
     <div id="pag-inicio" class="pagina ativa">
         <img id="imgBanner" class="banner-inicio" src="banner1.jpg" alt="Banner ! KanK">
-        
         <h1 class="titulo">Bem-vindo à ! KanK</h1>
         <p class="texto">Uma comunidade para jogos, conversas e novas amizades.</p>
         <a href="https://discord.gg/kank" target="_blank" class="botao">Entre!</a>
     </div>
 
-    <!-- TIKTOKS -->
     <div id="pag-tiktok" class="pagina">
         <h1 class="titulo">TikToks do servidor</h1>
         <div style="display:flex; flex-direction:column; gap:10px; margin-top:20px;">
@@ -184,7 +178,6 @@
         </div>
     </div>
 
-    <!-- TROFÉUS -->
     <div id="pag-trofeus" class="pagina">
         <h1 class="titulo">Troféus</h1>
         <p class="texto">Cada um mantém a organização e ordem do servidor de uma forma diferente, sempre de maneira pacífica e legalizada.</p>
@@ -192,14 +185,12 @@
         <button class="btn-adicionar" id="btnAddTrofeus" onclick="abrirModalNovo('trofeus')">+ Adicionar</button>
     </div>
 
-    <!-- CARGOS -->
     <div id="pag-cargos" class="pagina">
         <h1 class="titulo">Cargos do Servidor</h1>
         <div id="lista-cargos"></div>
         <button class="btn-adicionar" id="btnAddCargos" onclick="abrirModalNovo('cargos')">+ Adicionar Cargo</button>
     </div>
 
-    <!-- ARMAZENAMENTO -->
     <div id="pag-armazenamento" class="pagina">
         <h1 class="titulo">Armazenamento de Mídia</h1>
         <p class="texto">Faça upload de fotos e vídeos para ficarem guardados no site.</p>
@@ -210,7 +201,6 @@
         <div class="grade-armazenamento" id="gradeMidias"></div>
     </div>
 
-    <!-- RANKING SEMANAL -->
     <div id="pag-ranking" class="pagina">
         <h1 class="titulo">Ranking Semanal</h1>
         <div class="navegacao-ranking">
@@ -221,7 +211,6 @@
         <button class="btn-adicionar" id="btnAddRanking" onclick="abrirModalNovoRanking()">+ Adicionar</button>
     </div>
 
-    <!-- ALTA ELITE (LOGIN) -->
     <div id="pag-login" class="pagina">
         <h1 class="titulo">Alta Elite</h1>
         <div class="caixa-login" id="boxFormLogin">
@@ -237,19 +226,10 @@
         <div class="caixa-login" id="boxSucessoLogin" style="display:none; text-align:center;">
             <p class="texto" id="txtBoasVindas" style="font-weight:bold; font-size:18px; margin-bottom:5px;"></p>
             <p class="texto" id="txtTipoAcesso" style="color:#aaa; font-size:14px; margin-bottom:15px;"></p>
-
-            <div class="caixa-backup" id="boxAreaBackup">
-                <p class="texto" style="font-size:13px; color:#ff3385;">💾 <b>Gerenciar Arquivo de Dados:</b></p>
-                <button onclick="exportarDados()" style="width:100%; margin-bottom:8px;">📥 Baixar Arquivo (Backup)</button>
-                <input type="file" id="inputImportar" accept=".json" style="display:none;" onchange="importarDados(event)">
-                <button onclick="document.getElementById('inputImportar').click()" style="background:#222; border:1px solid #ff3385; color:#ff3385; width:100%; margin-bottom:15px;">📤 Carregar/Mudar Arquivo</button>
-            </div>
-
             <button onclick="executarLogout()" style="background:#441122; border:1px solid #ff3385; color:#fff; width:100%;">Sair da Conta</button>
         </div>
     </div>
 
-    <!-- CONF. ACESSOS -->
     <div id="pag-configuracao" class="pagina">
         <h1 class="titulo">Conf. Acessos</h1>
         <div id="lista-acessos"></div>
@@ -257,7 +237,6 @@
     </div>
 </div>
 
-<!-- MODAL DE EDIÇÃO -->
 <div class="fundo-modal" id="fundoModal" onclick="fecharModal()"></div>
 <div class="modal-editar" id="modalForm">
     <h2 class="titulo" id="modalTitulo" style="font-size:20px; margin-top:0;">Editar</h2>
@@ -271,8 +250,7 @@
             <div id="boxCorCargo" style="display:none; margin:8px 0;">
                 <label style="color:#aaa; font-size:14px;">Cor do Cargo:</label>
                 <input type="color" id="inpCorCargo" value="#ff3385">
-                
-                <label style="color:#aaa; font-size:14px; margin-top:10px; display:block;">Imagem do Cargo (Link ou Nome do Arquivo):</label>
+                <label style="color:#aaa; font-size:14px; margin-top:10px; display:block;">Imagem do Cargo (Link ou Nome):</label>
                 <input type="text" id="inpImgCargoLink" placeholder="ex: imagem.png ou https://...">
             </div>
             <input type="text" id="inpDesc" placeholder="Descrição / Valor">
@@ -285,12 +263,10 @@
                     <input type="checkbox" id="chkConfiavel" onchange="alternarModeradorConfiavel(this.checked)">
                     ⭐ Moderador Confiável (Modifica Tudo)
                 </label>
-                
                 <label class="checkbox-item destaque-acessos">
                     <input type="checkbox" id="chkAcessos">
                     🔑 Configurar Acessos
                 </label>
-
                 <label class="checkbox-item"><input type="checkbox" id="chkCargos" class="chk-perm"> Modificar Cargos</label>
                 <label class="checkbox-item"><input type="checkbox" id="chkTrofeus" class="chk-perm"> Modificar Troféus</label>
                 <label class="checkbox-item"><input type="checkbox" id="chkAdms" class="chk-perm"> Modificar Administradores</label>
@@ -305,7 +281,6 @@
     </form>
 </div>
 
-<!-- MODAL DE MENSAGENS -->
 <div class="fundo-modal" id="fundoModalAviso" style="z-index: 1000;"></div>
 <div class="modal-editar" id="modalAviso" style="z-index: 1001; text-align: center;">
     <h2 class="titulo" id="avisoTitulo" style="font-size:20px; margin-top:0;">Mensagem</h2>
@@ -316,7 +291,24 @@
     </div>
 </div>
 
-<script>
+<!-- SCRIPTS DO FIREBASE -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCQyF3eVfOkLHyRq65J-Xk_N097C4-e6k4",
+        authDomain: "kank-gg.firebaseapp.com",
+        projectId: "kank-gg",
+        storageBucket: "kank-gg.firebasestorage.app",
+        messagingSenderId: "835333477152",
+        appId: "1:835333477152:web:5cc3a7ba2652417940fd45",
+        measurementId: "G-GZJ1ECMJXE"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
     const DONO_PROTEGIDO = "fcw.";
     const DONOS = ["fcw.", "ruminancia"];
 
@@ -341,23 +333,45 @@
     let rkChamadaPadrao = [{ nome: "fcw.", tag: "fcw.", valor: "42h 15min" }];
     let rkMsgsPadrao = [{ nome: "True", tag: "u0dt", valor: "1.850 mensagens" }];
 
-    let acessos = JSON.parse(localStorage.getItem('kank_acessos')) || acessosPadrao;
-    let trofeus = JSON.parse(localStorage.getItem('kank_trofeus')) || trofeusPadrao;
-    let cargos = JSON.parse(localStorage.getItem('kank_cargos')) || cargosPadrao;
-    let rkChamada = JSON.parse(localStorage.getItem('kank_rk_chamada')) || rkChamadaPadrao;
-    let rkMsgs = JSON.parse(localStorage.getItem('kank_rk_msgs')) || rkMsgsPadrao;
-    let midiasArmazenadas = JSON.parse(localStorage.getItem('kank_midias')) || [];
+    let acessos = JSON.parse(JSON.stringify(acessosPadrao));
+    let trofeus = JSON.parse(JSON.stringify(trofeusPadrao));
+    let cargos = JSON.parse(JSON.stringify(cargosPadrao));
+    let rkChamada = JSON.parse(JSON.stringify(rkChamadaPadrao));
+    let rkMsgs = JSON.parse(JSON.stringify(rkMsgsPadrao));
+    let midiasArmazenadas = [];
 
     let usuarioAtual = null; 
     let abaRanking = 'chamada';
 
-    function salvarTudo() {
-        localStorage.setItem('kank_acessos', JSON.stringify(acessos));
-        localStorage.setItem('kank_trofeus', JSON.stringify(trofeus));
-        localStorage.setItem('kank_cargos', JSON.stringify(cargos));
-        localStorage.setItem('kank_rk_chamada', JSON.stringify(rkChamada));
-        localStorage.setItem('kank_rk_msgs', JSON.stringify(rkMsgs));
-        localStorage.setItem('kank_midias', JSON.stringify(midiasArmazenadas));
+    async function carregarDadosNuvem() {
+        try {
+            const docRef = doc(db, "kank_dados", "principal");
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                const dados = docSnap.data();
+                if (dados.acessos) acessos = dados.acessos;
+                if (dados.trofeus) trofeus = dados.trofeus;
+                if (dados.cargos) cargos = dados.cargos;
+                if (dados.rkChamada) rkChamada = dados.rkChamada;
+                if (dados.rkMsgs) rkMsgs = dados.rkMsgs;
+                if (dados.midias) midiasArmazenadas = dados.midias;
+            } else {
+                await salvarTudoNuvem();
+            }
+        } catch (e) {
+            console.log("Erro ao carregar nuvem:", e);
+        }
+        atualizarInterface();
+    }
+
+    async function salvarTudoNuvem() {
+        try {
+            await setDoc(doc(db, "kank_dados", "principal"), {
+                acessos, trofeus, cargos, rkChamada, rkMsgs, midias: midiasArmazenadas
+            });
+        } catch (e) {
+            console.log("Erro ao salvar nuvem:", e);
+        }
     }
 
     function buscar(id) { return document.getElementById(id); }
@@ -365,13 +379,8 @@
 
     function podeModificar(permissao) {
         if (!usuarioAtual || !acessos[usuarioAtual]) return false;
-        
-        if (permissao === 'podeAcessos') {
-            return ehDono(usuarioAtual) || !!acessos[usuarioAtual].podeAcessos;
-        }
-
+        if (permissao === 'podeAcessos') return ehDono(usuarioAtual) || !!acessos[usuarioAtual].podeAcessos;
         if (ehDono(usuarioAtual) || acessos[usuarioAtual].eConfiavel) return true;
-        
         return !!acessos[usuarioAtual][permissao];
     }
 
@@ -382,7 +391,7 @@
         });
     }
 
-    function exibirAvisoCustomizado(mensagem, ehConfirmacao = false, callbackConfirmar = null) {
+    window.exibirAvisoCustomizado = function(mensagem, ehConfirmacao = false, callbackConfirmar = null) {
         const fundo = buscar('fundoModalAviso');
         const modal = buscar('modalAviso');
         const txt = buscar('avisoTexto');
@@ -395,53 +404,35 @@
 
         if (ehConfirmacao) {
             btnCancel.style.display = 'inline-block';
-            btnCancel.onclick = function() {
-                fundo.style.display = 'none';
-                modal.style.display = 'none';
-            };
-            btnConf.onclick = function() {
-                fundo.style.display = 'none';
-                modal.style.display = 'none';
-                if (callbackConfirmar) callbackConfirmar();
-            };
+            btnCancel.onclick = () => { fundo.style.display = 'none'; modal.style.display = 'none'; };
+            btnConf.onclick = () => { fundo.style.display = 'none'; modal.style.display = 'none'; if (callbackConfirmar) callbackConfirmar(); };
         } else {
             btnCancel.style.display = 'none';
-            btnConf.onclick = function() {
-                fundo.style.display = 'none';
-                modal.style.display = 'none';
-            };
+            btnConf.onclick = () => { fundo.style.display = 'none'; modal.style.display = 'none'; };
         }
-    }
+    };
 
-    function abrirOuFecharMenu() {
+    window.abrirOuFecharMenu = function() {
         const m = buscar('menuPrincipal');
         if (m) m.classList.toggle('aberto');
-    }
+    };
 
-    function irParaPagina(id) {
-        if ((id === 'armazenamento' || id === 'cargos') && !usuarioAtual) {
-            irParaPagina('login');
-            return;
-        }
-        if (id === 'configuracao' && (!usuarioAtual || !podeModificar('podeAcessos'))) {
-            irParaPagina('inicio');
-            return;
-        }
-
+    window.irParaPagina = function(id) {
+        if ((id === 'armazenamento' || id === 'cargos') && !usuarioAtual) { irParaPagina('login'); return; }
+        if (id === 'configuracao' && (!usuarioAtual || !podeModificar('podeAcessos'))) { irParaPagina('inicio'); return; }
         const menu = buscar('menuPrincipal');
         if (menu) menu.classList.remove('aberto');
-
         document.querySelectorAll('.pagina').forEach(p => p.classList.remove('ativa'));
         const alvo = buscar('pag-' + id);
         if (alvo) alvo.classList.add('ativa');
-    }
+    };
 
-    function alternarVisibilidadeSenha() {
+    window.alternarVisibilidadeSenha = function() {
         const inp = buscar('campoSenha');
         if (inp) inp.type = (inp.type === 'password') ? 'text' : 'password';
-    }
+    };
 
-    function executarLogin() {
+    window.executarLogin = function() {
         const u = buscar('campoUsuario') ? buscar('campoUsuario').value.trim() : '';
         const s = buscar('campoSenha') ? buscar('campoSenha').value.trim() : '';
         const erro = buscar('msgErroLogin');
@@ -449,64 +440,20 @@
         if (acessos[u] && acessos[u].senha === s) {
             if (erro) erro.style.display = 'none';
             usuarioAtual = u;
-            exibirAvisoCustomizado(`✅ Bem-vindo(a), ${u}!`);
+            window.exibirAvisoCustomizado(`✅ Bem-vindo(a), ${u}!`);
             atualizarInterface();
             if (buscar('campoUsuario')) buscar('campoUsuario').value = '';
             if (buscar('campoSenha')) buscar('campoSenha').value = '';
         } else {
             if (erro) erro.style.display = 'block';
         }
-    }
+    };
 
-    function executarLogout() {
+    window.executarLogout = function() {
         usuarioAtual = null;
         atualizarInterface();
-        irParaPagina('inicio');
-    }
-
-    function exportarDados() {
-        if (!usuarioAtual || (!ehDono(usuarioAtual) && !acessos[usuarioAtual].eConfiavel)) {
-            exibirAvisoCustomizado("❌ Apenas moderadores confiáveis podem baixar arquivos!");
-            return;
-        }
-        const dadosCompletos = { acessos, trofeus, cargos, rkChamada, rkMsgs, midiasArmazenadas };
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dadosCompletos, null, 2));
-        const downloadAnchor = document.createElement('a');
-        downloadAnchor.setAttribute("href", dataStr);
-        downloadAnchor.setAttribute("download", "kank_dados_site.json");
-        document.body.appendChild(downloadAnchor);
-        downloadAnchor.click();
-        downloadAnchor.remove();
-        exibirAvisoCustomizado("📥 Backup baixado com sucesso!");
-    }
-
-    function importarDados(e) {
-        if (!usuarioAtual || (!ehDono(usuarioAtual) && !acessos[usuarioAtual].eConfiavel)) {
-            exibirAvisoCustomizado("❌ Apenas moderadores confiáveis podem carregar arquivos!");
-            return;
-        }
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-            try {
-                const dados = JSON.parse(evt.target.result);
-                if (dados.cargos) cargos = dados.cargos;
-                if (dados.trofeus) trofeus = dados.trofeus;
-                if (dados.acessos) acessos = dados.acessos;
-                if (dados.rkChamada) rkChamada = dados.rkChamada;
-                if (dados.rkMsgs) rkMsgs = dados.rkMsgs;
-                if (dados.midiasArmazenadas) midiasArmazenadas = dados.midiasArmazenadas;
-
-                salvarTudo();
-                atualizarInterface();
-                exibirAvisoCustomizado("✅ Backup carregado com sucesso!");
-            } catch (err) {
-                exibirAvisoCustomizado("❌ Arquivo de backup inválido.");
-            }
-        };
-        reader.readAsText(file);
-    }
+        window.irParaPagina('inicio');
+    };
 
     function atualizarInterface() {
         const logado = !!usuarioAtual;
@@ -525,7 +472,6 @@
         const sLog = buscar('boxSucessoLogin');
         const txtV = buscar('txtBoasVindas');
         const txtT = buscar('txtTipoAcesso');
-        const areaBackup = buscar('boxAreaBackup');
 
         if (logado) {
             if (fLog) fLog.style.display = 'none';
@@ -536,7 +482,6 @@
                 else if (eConfiavel) txtT.innerText = "Nível de Acesso: Moderador Confiável";
                 else txtT.innerText = "Nível de Acesso: Personalizado";
             }
-            if (areaBackup) areaBackup.style.display = (eDono || eConfiavel) ? 'block' : 'none';
         } else {
             if (fLog) fLog.style.display = 'block';
             if (sLog) sLog.style.display = 'none';
@@ -604,21 +549,21 @@
         `).join('');
     }
 
-    function fazerUploadMidia(e) {
+    window.fazerUploadMidia = function(e) {
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
-        reader.onload = function (evt) {
+        reader.onload = async function (evt) {
             midiasArmazenadas.push({
                 tipo: file.type.startsWith('video') ? 'video' : 'imagem',
                 src: evt.target.result,
                 nome: file.name
             });
-            salvarTudo();
+            await salvarTudoNuvem();
             renderizarArmazenamento();
         };
         reader.readAsDataURL(file);
-    }
+    };
 
     function renderizarArmazenamento() {
         const el = buscar('gradeMidias');
@@ -627,7 +572,6 @@
             el.innerHTML = '<p class="texto" style="color:#888; grid-column: 1/-1;">Nenhuma mídia armazenada no momento.</p>';
             return;
         }
-
         const eDono = usuarioAtual && ehDono(usuarioAtual);
         el.innerHTML = midiasArmazenadas.map((m, i) => `
             <div class="card-midia">
@@ -637,20 +581,20 @@
         `).join('');
     }
 
-    function excluirMidia(idx) {
-        exibirAvisoCustomizado("Deseja apagar esta mídia do armazenamento?", true, function() {
+    window.excluirMidia = function(idx) {
+        window.exibirAvisoCustomizado("Deseja apagar esta mídia do armazenamento?", true, async function() {
             midiasArmazenadas.splice(idx, 1);
-            salvarTudo();
+            await salvarTudoNuvem();
             renderizarArmazenamento();
         });
-    }
+    };
 
-    function alternarAbaRanking(aba) {
+    window.alternarAbaRanking = function(aba) {
         abaRanking = aba;
         if (buscar('abaChamada')) buscar('abaChamada').classList.toggle('ativo', aba === 'chamada');
         if (buscar('abaMsgs')) buscar('abaMsgs').classList.toggle('ativo', aba === 'mensagens');
         renderizarRanking();
-    }
+    };
 
     function renderizarRanking() {
         const el = buscar('conteudoRanking');
@@ -712,7 +656,6 @@
         if (buscar('inpTag')) { buscar('inpTag').style.display = 'block'; buscar('inpTag').value = ''; }
         if (buscar('inpDesc')) { buscar('inpDesc').style.display = 'block'; buscar('inpDesc').value = ''; }
         if (buscar('inpImgCargoLink')) buscar('inpImgCargoLink').value = '';
-        
         if (buscar('chkConfiavel')) buscar('chkConfiavel').checked = false;
         if (buscar('chkAcessos')) buscar('chkAcessos').checked = false;
         alternarModeradorConfiavel(false);
@@ -723,36 +666,35 @@
         if (buscar('modalForm')) buscar('modalForm').style.display = 'block';
     }
 
-    function fecharModal() {
+    window.fecharModal = function() {
         if (buscar('fundoModal')) buscar('fundoModal').style.display = 'none';
         if (buscar('modalForm')) buscar('modalForm').style.display = 'none';
-    }
+    };
 
-    function abrirModalNovo(tipo) {
+    window.abrirModalNovo = function(tipo) {
         if (!podeModificar('pode' + tipo.charAt(0).toUpperCase() + tipo.slice(1))) return;
         limparModal();
         if (buscar('modalTitulo')) buscar('modalTitulo').innerText = 'Adicionar Item';
         if (buscar('modalCtx')) buscar('modalCtx').value = tipo + '_novo';
         if (tipo === 'cargos' && buscar('boxCorCargo')) buscar('boxCorCargo').style.display = 'block';
         exibirModal();
-    }
+    };
 
-    function abrirModalNovoRanking() {
+    window.abrirModalNovoRanking = function() {
         if (!podeModificar('podeRanking')) return;
         limparModal();
         if (buscar('modalTitulo')) buscar('modalTitulo').innerText = 'Adicionar Posição';
         if (buscar('modalCtx')) buscar('modalCtx').value = 'rk_novo';
         exibirModal();
-    }
+    };
 
-    function abrirModalEditar(tipo, idx) {
+    window.abrirModalEditar = function(tipo, idx) {
         limparModal();
         let item;
         if (tipo === 'trofeus') item = trofeus[idx];
         else if (tipo === 'cargos') item = cargos[idx];
         else if (tipo === 'rk_chamada') item = rkChamada[idx];
         else if (tipo === 'rk_mensagens') item = rkMsgs[idx];
-
         if (!item) return;
 
         if (buscar('modalTitulo')) buscar('modalTitulo').innerText = 'Editar Item';
@@ -769,9 +711,9 @@
             if (buscar('inpImgCargoLink')) buscar('inpImgCargoLink').value = item.img || '';
         }
         exibirModal();
-    }
+    };
 
-    function abrirModalNovoAcesso() {
+    window.abrirModalNovoAcesso = function() {
         if (!podeModificar('podeAcessos')) return;
         limparModal();
         if (buscar('modalTitulo')) buscar('modalTitulo').innerText = 'Cadastrar Acesso';
@@ -780,9 +722,9 @@
         if (buscar('inpDesc')) buscar('inpDesc').style.display = 'none';
         if (buscar('camposAcessos')) buscar('camposAcessos').style.display = 'block';
         exibirModal();
-    }
+    };
 
-    function abrirModalEditarAcesso(usr) {
+    window.abrirModalEditarAcesso = function(usr) {
         if (!podeModificar('podeAcessos')) return;
         limparModal();
         const a = acessos[usr];
@@ -798,16 +740,13 @@
 
         if (buscar('inpNome')) {
             buscar('inpNome').value = usr;
-            if (usr === DONO_PROTEGIDO) {
-                buscar('inpNome').disabled = true;
-            }
+            if (usr === DONO_PROTEGIDO) buscar('inpNome').disabled = true;
         }
         if (buscar('inpSenhaAcesso')) buscar('inpSenhaAcesso').value = a.senha;
 
         const confiavel = !!a.eConfiavel;
         if (buscar('chkConfiavel')) buscar('chkConfiavel').checked = confiavel;
         if (buscar('chkAcessos')) buscar('chkAcessos').checked = !!a.podeAcessos;
-        
         alternarModeradorConfiavel(confiavel);
 
         if (!confiavel) {
@@ -818,23 +757,15 @@
         }
 
         if (usr === DONO_PROTEGIDO) {
-            if (buscar('chkConfiavel')) {
-                buscar('chkConfiavel').checked = true;
-                buscar('chkConfiavel').disabled = true;
-            }
-            if (buscar('chkAcessos')) {
-                buscar('chkAcessos').checked = true;
-                buscar('chkAcessos').disabled = true;
-            }
+            if (buscar('chkConfiavel')) { buscar('chkConfiavel').checked = true; buscar('chkConfiavel').disabled = true; }
+            if (buscar('chkAcessos')) { buscar('chkAcessos').checked = true; buscar('chkAcessos').disabled = true; }
             alternarModeradorConfiavel(true);
         }
-
         exibirModal();
-    }
+    };
 
-    function salvarFormularioModal(e) {
+    window.salvarFormularioModal = async function(e) {
         e.preventDefault();
-
         const ctx = buscar('modalCtx') ? buscar('modalCtx').value : '';
         const idx = buscar('modalIndex') ? buscar('modalIndex').value : '';
 
@@ -877,37 +808,35 @@
             }
         }
 
-        salvarTudo();
+        await salvarTudoNuvem();
         atualizarInterface();
-        fecharModal();
-    }
+        window.fecharModal();
+    };
 
-    function apagarItem(tipo, idx) {
-        exibirAvisoCustomizado("Tem certeza que deseja apagar? Esta ação é irreversível.", true, function() {
+    window.apagarItem = function(tipo, idx) {
+        window.exibirAvisoCustomizado("Tem certeza que deseja apagar? Esta ação é irreversível.", true, async function() {
             if (tipo === 'trofeus') trofeus.splice(idx, 1);
             else if (tipo === 'cargos') cargos.splice(idx, 1);
             else if (tipo === 'rk_chamada') rkChamada.splice(idx, 1);
             else if (tipo === 'rk_mensagens') rkMsgs.splice(idx, 1);
-            salvarTudo();
+            await salvarTudoNuvem();
             atualizarInterface();
         });
-    }
+    };
 
-    function apagarAcesso(usr) {
+    window.apagarAcesso = function(usr) {
         if (usr === DONO_PROTEGIDO) {
-            exibirAvisoCustomizado("❌ A conta do dono (fcw.) não pode ser excluída!");
+            window.exibirAvisoCustomizado("❌ A conta do dono (fcw.) não pode ser excluída!");
             return;
         }
-        exibirAvisoCustomizado("Tem certeza que deseja apagar este acesso?", true, function() {
+        window.exibirAvisoCustomizado("Tem certeza que deseja apagar este acesso?", true, async function() {
             delete acessos[usr];
-            salvarTudo();
+            await salvarTudoNuvem();
             atualizarInterface();
         });
-    }
+    };
 
-    document.addEventListener("DOMContentLoaded", function () {
-        atualizarInterface();
-    });
+    carregarDadosNuvem();
 </script>
 
 </body>
