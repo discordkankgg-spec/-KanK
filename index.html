@@ -356,6 +356,13 @@
                 if (b.rkMsgs) rkMsgs = b.rkMsgs;
                 if (b.banidos) banidos = b.banidos;
                 if (b.midias) midiasArmazenadas = b.midias;
+                
+                // Validação de segurança: se o usuário atual salvo não existe mais nas credenciais, limpa o login
+                if (usuarioAtual && !acessos[usuarioAtual]) {
+                    usuarioAtual = null;
+                    localStorage.removeItem('kank_usuario_atual');
+                }
+                
                 atualizarInterface();
             } catch(e) {}
         }
@@ -371,6 +378,12 @@
                 if (dados.rkMsgs) rkMsgs = dados.rkMsgs;
                 if (dados.banidos) banidos = dados.banidos;
                 if (dados.midias) midiasArmazenadas = dados.midias;
+                
+                if (usuarioAtual && !acessos[usuarioAtual]) {
+                    usuarioAtual = null;
+                    localStorage.removeItem('kank_usuario_atual');
+                }
+
                 salvarLocalmente();
                 atualizarInterface();
             }
@@ -415,11 +428,28 @@
     };
 
     window.abrirOuFecharMenu = () => buscar('menuPrincipal').classList.toggle('aberto');
+    
     window.irParaPagina = function(id) {
+        // Bloqueio preventivo caso tentem entrar em páginas restritas deslogados
+        if ((id === 'cargos' || id === 'armazenamento') && !usuarioAtual) {
+            irParaPagina('login');
+            return;
+        }
+        if (id === 'banimento' && (!usuarioAtual || !ehConfiavelOuDono(usuarioAtual))) {
+            irParaPagina('login');
+            return;
+        }
+        if (id === 'configuracao' && (!usuarioAtual || !ehDono(usuarioAtual))) {
+            irParaPagina('login');
+            return;
+        }
+
         buscar('menuPrincipal').classList.remove('aberto');
         document.querySelectorAll('.pagina').forEach(p => p.classList.remove('ativa'));
-        buscar('pag-' + id).classList.add('ativa');
+        const pagAlvo = buscar('pag-' + id);
+        if (pagAlvo) pagAlvo.classList.add('ativa');
     };
+
     window.alternarVisibilidadeSenha = function() {
         const i = buscar('campoSenha'); if (i) i.type = (i.type === 'password') ? 'text' : 'password';
     };
@@ -433,14 +463,17 @@
             localStorage.setItem('kank_usuario_atual', u);
             atualizarInterface();
             buscar('campoUsuario').value = ''; buscar('campoSenha').value = '';
+            irParaPagina('inicio');
         } else {
             buscar('msgErroLogin').style.display = 'block';
         }
     };
 
     window.executarLogout = function() {
-        usuarioAtual = null; localStorage.removeItem('kank_usuario_atual');
-        atualizarInterface(); window.irParaPagina('inicio');
+        usuarioAtual = null; 
+        localStorage.removeItem('kank_usuario_atual');
+        atualizarInterface(); 
+        window.irParaPagina('inicio');
     };
 
     function atualizarInterface() {
@@ -448,10 +481,10 @@
         const confiavel = logado && ehConfiavelOuDono(usuarioAtual);
         const icarDono = logado && ehDono(usuarioAtual);
 
+        // Visibilidade estrita dos itens no menu do cabeçalho
         if (buscar('itemCargos')) buscar('itemCargos').style.display = logado ? 'block' : 'none';
         if (buscar('itemArmazenamento')) buscar('itemArmazenamento').style.display = logado ? 'block' : 'none';
         if (buscar('itemBanimento')) buscar('itemBanimento').style.display = confiavel ? 'block' : 'none';
-        
         if (buscar('itemConfAcessos')) buscar('itemConfAcessos').style.display = icarDono ? 'block' : 'none';
 
         if (logado) {
@@ -461,17 +494,26 @@
         } else {
             buscar('boxFormLogin').style.display = 'block';
             buscar('boxSucessoLogin').style.display = 'none';
+
+            // Se o usuário estiver numa página restrita e deslogar, redireciona para o Início
+            const paginaAtiva = document.querySelector('.pagina.ativa');
+            if (paginaAtiva && (paginaAtiva.id === 'pag-cargos' || paginaAtiva.id === 'pag-armazenamento' || paginaAtiva.id === 'pag-banimento' || paginaAtiva.id === 'pag-configuracao')) {
+                irParaPagina('inicio');
+            }
         }
 
         buscar('btnAddTrofeus').style.display = podeModificar('podeTrofeus') ? 'block' : 'none';
         buscar('btnAddCargos').style.display = podeModificar('podeCargos') ? 'block' : 'none';
         buscar('btnAddBanimento').style.display = confiavel ? 'block' : 'none';
         buscar('btnAddRanking').style.display = podeModificar('podeRanking') ? 'block' : 'none';
-        
         buscar('btnAddAcessos').style.display = icarDono ? 'block' : 'none';
 
-        renderizarTrofeus(); renderizarCargos(); renderizarArmazenamento();
-        renderizarBanidos(); renderizarRanking(); renderizarAcessos();
+        renderizarTrofeus(); 
+        renderizarCargos(); 
+        renderizarArmazenamento();
+        renderizarBanidos(); 
+        renderizarRanking(); 
+        renderizarAcessos();
     }
 
     function renderizarCargos() {
