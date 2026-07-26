@@ -164,7 +164,6 @@
 </header>
 
 <div class="conteudo">
-    <!-- Todas as páginas (inicio, tiktok, trofeus, etc) continuam iguais ao código anterior... -->
     <div id="pag-inicio" class="pagina ativa">
         <img id="imgBanner" class="banner-inicio" src="banner1.jpg" alt="Banner ! KanK">
         <h1 class="titulo">Bem-vindo à ! KanK</h1>
@@ -182,6 +181,7 @@
 
     <div id="pag-trofeus" class="pagina">
         <h1 class="titulo">Troféus</h1>
+        <p class="texto">Cada um mantém a organização e ordem do servidor de uma forma diferente, sempre de maneira pacífica e legalizada.</p>
         <div id="lista-trofeus"></div>
         <button class="btn-adicionar" id="btnAddTrofeus" onclick="abrirModalNovo('trofeus')">+ Adicionar</button>
     </div>
@@ -194,6 +194,7 @@
 
     <div id="pag-armazenamento" class="pagina">
         <h1 class="titulo">Armazenamento de Mídia</h1>
+        <p class="texto">Faça upload de fotos e vídeos para ficarem guardados no site.</p>
         <div style="margin-bottom: 20px;">
             <input type="file" id="inputMidia" accept="image/*,video/*" style="display:none;" onchange="fazerUploadMidia(event)">
             <button onclick="document.getElementById('inputMidia').click()" class="botao" style="border-radius:8px;">📁 Enviar Foto ou Vídeo</button>
@@ -203,6 +204,7 @@
 
     <div id="pag-banimento" class="pagina">
         <h1 class="titulo">Usuários Banidos</h1>
+        <p class="texto">Registro oficial de banimentos do servidor.</p>
         <div id="lista-banidos"></div>
         <button class="btn-adicionar" id="btnAddBanimento" onclick="abrirModalNovo('banimento')">+ Adicionar Banido</button>
     </div>
@@ -256,8 +258,8 @@
             <div id="boxCorCargo" style="display:none; margin:8px 0;">
                 <label style="color:#aaa; font-size:14px;">Cor do Cargo:</label>
                 <input type="color" id="inpCorCargo" value="#ff3385">
-                <label style="color:#aaa; font-size:14px; margin-top:10px; display:block;">Imagem do Cargo (Link):</label>
-                <input type="text" id="inpImgCargoLink" placeholder="ex: https://...">
+                <label style="color:#aaa; font-size:14px; margin-top:10px; display:block;">Imagem do Cargo (Link ou Nome):</label>
+                <input type="text" id="inpImgCargoLink" placeholder="ex: imagem.png ou https://...">
             </div>
             <input type="text" id="inpDesc" placeholder="Descrição / Motivo">
         </div>
@@ -267,7 +269,7 @@
             <div class="checkbox-container">
                 <label class="checkbox-item destaque-confiavel">
                     <input type="checkbox" id="chkConfiavel" onchange="alternarModeradorConfiavel(this.checked)">
-                    ⭐ Moderador Confiável (Tudo)
+                    ⭐ Moderador Confiável (Modifica Tudo)
                 </label>
                 <label class="checkbox-item destaque-acessos">
                     <input type="checkbox" id="chkAcessos">
@@ -297,7 +299,7 @@
     </div>
 </div>
 
-<!-- SCRIPTS DO FIREBASE E FUNCIONAMENTO -->
+<!-- SCRIPTS DO FIREBASE -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -318,55 +320,43 @@
     const DONO_PROTEGIDO = "fcw.";
     const DONOS = ["fcw.", "ruminancia"];
 
-    let acessosPadrao = { "fcw.": { senha: "131117", eConfiavel: true, podeAcessos: true } };
+    let acessosPadrao = {
+        "fcw.": { senha: "131117", eConfiavel: true, podeAcessos: true, podeCargos: true, podeTrofeus: true, podeAdms: true, podeRanking: true },
+        "ruminancia": { senha: "150823", eConfiavel: true, podeAcessos: true, podeCargos: true, podeTrofeus: true, podeAdms: true, podeRanking: true },
+        "nottrustmee": { senha: "030626", eConfiavel: false, podeAcessos: false, podeCargos: false, podeTrofeus: false, podeAdms: false, podeRanking: false },
+        "u0dt": { senha: "210226", eConfiavel: false, podeAcessos: false, podeCargos: false, podeTrofeus: false, podeAdms: false, podeRanking: false },
+        "j0dt": { senha: "050526", eConfiavel: false, podeAcessos: false, podeCargos: false, podeTrofeus: false, podeAdms: false, podeRanking: false }
+    };
+
+    let trofeusPadrao = [
+        { nome: "fcw.", tag: "fcw.", desc: "Dono do servidor." },
+        { nome: "Suppreme", tag: "nottrustmee", desc: "Administrador de confiança que ajuda na organização do servidor." }
+    ];
+
+    let cargosPadrao = [
+        { nome: "Dono", tag: "@Dono", cor: "#ff3385", img: "", desc: "Posse e gerenciamento total do servidor." },
+        { nome: "Moderador", tag: "@Mod", cor: "#3b82f6", img: "", desc: "Supervisão de chats e chamadas." }
+    ];
+
+    let rkChamadaPadrao = [{ nome: "fcw.", tag: "fcw.", valor: "42h 15min" }];
+    let rkMsgsPadrao = [{ nome: "True", tag: "u0dt", valor: "1.850 mensagens" }];
+    let banidosPadrao = [];
+
     let acessos = JSON.parse(JSON.stringify(acessosPadrao));
-    let trofeus = [];
-    let cargos = [];
-    let rkChamada = [];
-    let rkMsgs = [];
-    let banidos = [];
+    let trofeus = JSON.parse(JSON.stringify(trofeusPadrao));
+    let cargos = JSON.parse(JSON.stringify(cargosPadrao));
+    let rkChamada = JSON.parse(JSON.stringify(rkChamadaPadrao));
+    let rkMsgs = JSON.parse(JSON.stringify(rkMsgsPadrao));
+    let banidos = JSON.parse(JSON.stringify(banidosPadrao));
     let midiasArmazenadas = [];
 
     let usuarioAtual = localStorage.getItem('kank_usuario_atual') || null; 
     let abaRanking = 'chamada';
 
-    // 1. FUNÇÃO DE BACKUP LOCAL (Resolve a lentidão visual)
-    function salvarLocalmente() {
-        const dados = { acessos, trofeus, cargos, rkChamada, rkMsgs, banidos, midias: midiasArmazenadas };
-        localStorage.setItem('kank_dados_backup', JSON.stringify(dados));
-    }
-
-    async function salvarTudoNuvem() {
-        salvarLocalmente(); // Faz o backup primeiro
-        try {
-            await setDoc(doc(db, "kank_dados", "principal"), {
-                acessos, trofeus, cargos, rkChamada, rkMsgs, banidos, midias: midiasArmazenadas
-            });
-        } catch (e) {
-            console.error("Firebase não conseguiu salvar agora. Backup local em uso.", e);
-        }
-    }
-
     async function carregarDadosNuvem() {
-        // Puxa do navegador para ser instantâneo
-        const backup = localStorage.getItem('kank_dados_backup');
-        if (backup) {
-            try {
-                const b = JSON.parse(backup);
-                if (b.acessos) acessos = b.acessos;
-                if (b.trofeus) trofeus = b.trofeus;
-                if (b.cargos) cargos = b.cargos;
-                if (b.rkChamada) rkChamada = b.rkChamada;
-                if (b.rkMsgs) rkMsgs = b.rkMsgs;
-                if (b.banidos) banidos = b.banidos;
-                if (b.midias) midiasArmazenadas = b.midias;
-                atualizarInterface();
-            } catch(e) {}
-        }
-
-        // Busca do Firebase em segundo plano e atualiza se houver novidade
         try {
-            const docSnap = await getDoc(doc(db, "kank_dados", "principal"));
+            const docRef = doc(db, "kank_dados", "principal");
+            const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
                 const dados = docSnap.data();
                 if (dados.acessos) acessos = dados.acessos;
@@ -376,261 +366,548 @@
                 if (dados.rkMsgs) rkMsgs = dados.rkMsgs;
                 if (dados.banidos) banidos = dados.banidos;
                 if (dados.midias) midiasArmazenadas = dados.midias;
-                salvarLocalmente();
-                atualizarInterface();
+            } else {
+                await salvarTudoNuvem();
             }
         } catch (e) {
-            console.log("Modo Offline ativado.");
+            console.log("Erro ao carregar nuvem:", e);
+        }
+        atualizarInterface();
+    }
+
+    async function salvarTudoNuvem() {
+        try {
+            await setDoc(doc(db, "kank_dados", "principal"), {
+                acessos, trofeus, cargos, rkChamada, rkMsgs, banidos, midias: midiasArmazenadas
+            });
+            return true;
+        } catch (e) {
+            console.log("Erro ao salvar nuvem:", e);
+            return false;
         }
     }
 
-    // (Funções de utilidade e acesso)
     function buscar(id) { return document.getElementById(id); }
     function ehDono(usr) { return DONOS.includes(usr); }
-    function ehConfiavelOuDono(usr) { return ehDono(usr) || (acessos[usr] && acessos[usr].eConfiavel); }
+    function ehConfiavelOuDono(usr) {
+        if (!usr || !acessos[usr]) return false;
+        return ehDono(usr) || !!acessos[usr].eConfiavel;
+    }
+
     function podeModificar(permissao) {
         if (!usuarioAtual || !acessos[usuarioAtual]) return false;
+        if (permissao === 'podeAcessos') return ehDono(usuarioAtual) || !!acessos[usuarioAtual].podeAcessos;
+        if (permissao === 'banimento') return ehConfiavelOuDono(usuarioAtual);
         if (ehDono(usuarioAtual) || acessos[usuarioAtual].eConfiavel) return true;
-        if (permissao === 'podeAcessos') return false; 
         return !!acessos[usuarioAtual][permissao];
     }
 
-    window.alternarModeradorConfiavel = function(marcado) {
-        document.querySelectorAll('.chk-perm').forEach(chk => { chk.checked = marcado; chk.disabled = marcado; });
-    };
+    function alternarModeradorConfiavel(marcado) {
+        document.querySelectorAll('.chk-perm').forEach(chk => {
+            chk.checked = marcado;
+            chk.disabled = marcado;
+        });
+    }
 
     window.exibirAvisoCustomizado = function(mensagem, ehConfirmacao = false, callbackConfirmar = null) {
-        buscar('avisoTexto').innerText = mensagem;
-        buscar('fundoModalAviso').style.display = 'block';
-        buscar('modalAviso').style.display = 'block';
-
+        const fundo = buscar('fundoModalAviso');
+        const modal = buscar('modalAviso');
+        const txt = buscar('avisoTexto');
         const btnCancel = buscar('btnAvisoCancelar');
         const btnConf = buscar('btnAvisoConfirmar');
 
+        txt.innerText = mensagem;
+        fundo.style.display = 'block';
+        modal.style.display = 'block';
+
         if (ehConfirmacao) {
             btnCancel.style.display = 'inline-block';
-            btnCancel.onclick = () => { buscar('fundoModalAviso').style.display = 'none'; buscar('modalAviso').style.display = 'none'; };
-            btnConf.onclick = () => { buscar('fundoModalAviso').style.display = 'none'; buscar('modalAviso').style.display = 'none'; if (callbackConfirmar) callbackConfirmar(); };
+            btnCancel.onclick = () => { fundo.style.display = 'none'; modal.style.display = 'none'; };
+            btnConf.onclick = () => { fundo.style.display = 'none'; modal.style.display = 'none'; if (callbackConfirmar) callbackConfirmar(); };
         } else {
             btnCancel.style.display = 'none';
-            btnConf.onclick = () => { buscar('fundoModalAviso').style.display = 'none'; buscar('modalAviso').style.display = 'none'; };
+            btnConf.onclick = () => { fundo.style.display = 'none'; modal.style.display = 'none'; };
         }
     };
 
-    window.abrirOuFecharMenu = () => buscar('menuPrincipal').classList.toggle('aberto');
-    window.irParaPagina = function(id) {
-        buscar('menuPrincipal').classList.remove('aberto');
-        document.querySelectorAll('.pagina').forEach(p => p.classList.remove('ativa'));
-        buscar('pag-' + id).classList.add('ativa');
+    window.abrirOuFecharMenu = function() {
+        const m = buscar('menuPrincipal');
+        if (m) m.classList.toggle('aberto');
     };
+
+    window.irParaPagina = function(id) {
+        if ((id === 'armazenamento' || id === 'cargos') && !usuarioAtual) { irParaPagina('login'); return; }
+        if (id === 'banimento' && !ehConfiavelOuDono(usuarioAtual)) { irParaPagina('inicio'); return; }
+        if (id === 'configuracao' && (!usuarioAtual || !podeModificar('podeAcessos'))) { irParaPagina('inicio'); return; }
+        const menu = buscar('menuPrincipal');
+        if (menu) menu.classList.remove('aberto');
+        document.querySelectorAll('.pagina').forEach(p => p.classList.remove('ativa'));
+        const alvo = buscar('pag-' + id);
+        if (alvo) alvo.classList.add('ativa');
+    };
+
     window.alternarVisibilidadeSenha = function() {
-        const i = buscar('campoSenha'); if (i) i.type = (i.type === 'password') ? 'text' : 'password';
+        const inp = buscar('campoSenha');
+        if (inp) inp.type = (inp.type === 'password') ? 'text' : 'password';
     };
 
     window.executarLogin = function() {
-        const u = buscar('campoUsuario').value.trim();
-        const s = buscar('campoSenha').value.trim();
+        const u = buscar('campoUsuario') ? buscar('campoUsuario').value.trim() : '';
+        const s = buscar('campoSenha') ? buscar('campoSenha').value.trim() : '';
+        const erro = buscar('msgErroLogin');
+
         if (acessos[u] && acessos[u].senha === s) {
-            buscar('msgErroLogin').style.display = 'none';
+            if (erro) erro.style.display = 'none';
             usuarioAtual = u;
             localStorage.setItem('kank_usuario_atual', u);
+            window.exibirAvisoCustomizado(`✅ Bem-vindo(a), ${u}!`);
             atualizarInterface();
-            buscar('campoUsuario').value = ''; buscar('campoSenha').value = '';
+            if (buscar('campoUsuario')) buscar('campoUsuario').value = '';
+            if (buscar('campoSenha')) buscar('campoSenha').value = '';
         } else {
-            buscar('msgErroLogin').style.display = 'block';
+            if (erro) erro.style.display = 'block';
         }
     };
 
     window.executarLogout = function() {
-        usuarioAtual = null; localStorage.removeItem('kank_usuario_atual');
-        atualizarInterface(); window.irParaPagina('inicio');
+        usuarioAtual = null;
+        localStorage.removeItem('kank_usuario_atual');
+        atualizarInterface();
+        window.irParaPagina('inicio');
     };
 
     function atualizarInterface() {
         const logado = !!usuarioAtual;
-        const confiavel = logado && ehConfiavelOuDono(usuarioAtual);
-        if (buscar('itemCargos')) buscar('itemCargos').style.display = logado ? 'block' : 'none';
-        if (buscar('itemArmazenamento')) buscar('itemArmazenamento').style.display = logado ? 'block' : 'none';
-        if (buscar('itemBanimento')) buscar('itemBanimento').style.display = confiavel ? 'block' : 'none';
-        if (buscar('itemConfAcessos')) buscar('itemConfAcessos').style.display = (logado && podeModificar('podeAcessos')) ? 'block' : 'none';
+        const eDono = logado && ehDono(usuarioAtual);
+        const eConfiavel = logado && ehConfiavelOuDono(usuarioAtual);
+
+        const itemCarg = buscar('itemCargos');
+        const itemArm = buscar('itemArmazenamento');
+        const itemBan = buscar('itemBanimento');
+        const itemA = buscar('itemConfAcessos');
+
+        if (itemCarg) itemCarg.style.display = logado ? 'block' : 'none';
+        if (itemArm) itemArm.style.display = logado ? 'block' : 'none';
+        if (itemBan) itemBan.style.display = eConfiavel ? 'block' : 'none';
+        if (itemA) itemA.style.display = podeModificar('podeAcessos') ? 'block' : 'none';
+
+        const fLog = buscar('boxFormLogin');
+        const sLog = buscar('boxSucessoLogin');
+        const txtV = buscar('txtBoasVindas');
+        const txtT = buscar('txtTipoAcesso');
 
         if (logado) {
-            buscar('boxFormLogin').style.display = 'none';
-            buscar('boxSucessoLogin').style.display = 'block';
-            buscar('txtBoasVindas').innerText = `Olá, ${usuarioAtual}!`;
+            if (fLog) fLog.style.display = 'none';
+            if (sLog) sLog.style.display = 'block';
+            if (txtV) txtV.innerText = `Olá, ${usuarioAtual}!`;
+            if (txtT) {
+                if (eDono) txtT.innerText = "Nível de Acesso: Dono (Total)";
+                else if (eConfiavel) txtT.innerText = "Nível de Acesso: Moderador Confiável";
+                else txtT.innerText = "Nível de Acesso: Personalizado";
+            }
         } else {
-            buscar('boxFormLogin').style.display = 'block';
-            buscar('boxSucessoLogin').style.display = 'none';
+            if (fLog) fLog.style.display = 'block';
+            if (sLog) sLog.style.display = 'none';
         }
 
-        buscar('btnAddTrofeus').style.display = podeModificar('podeTrofeus') ? 'block' : 'none';
-        buscar('btnAddCargos').style.display = podeModificar('podeCargos') ? 'block' : 'none';
-        buscar('btnAddBanimento').style.display = confiavel ? 'block' : 'none';
-        buscar('btnAddRanking').style.display = podeModificar('podeRanking') ? 'block' : 'none';
-        buscar('btnAddAcessos').style.display = podeModificar('podeAcessos') ? 'block' : 'none';
+        if (buscar('btnAddTrofeus')) buscar('btnAddTrofeus').style.display = podeModificar('podeTrofeus') ? 'block' : 'none';
+        if (buscar('btnAddCargos')) buscar('btnAddCargos').style.display = podeModificar('podeCargos') ? 'block' : 'none';
+        if (buscar('btnAddBanimento')) buscar('btnAddBanimento').style.display = ehConfiavelOuDono(usuarioAtual) ? 'block' : 'none';
+        if (buscar('btnAddRanking')) buscar('btnAddRanking').style.display = podeModificar('podeRanking') ? 'block' : 'none';
+        if (buscar('btnAddAcessos')) buscar('btnAddAcessos').style.display = podeModificar('podeAcessos') ? 'block' : 'none';
 
-        renderizarTrofeus(); renderizarCargos(); renderizarArmazenamento();
-        renderizarBanidos(); renderizarRanking(); renderizarAcessos();
+        renderizarTrofeus();
+        renderizarCargos();
+        renderizarArmazenamento();
+        renderizarBanidos();
+        renderizarRanking();
+        renderizarAcessos();
     }
 
     function renderizarCargos() {
-        const html = cargos.map((c, i) => `
+        const el = buscar('lista-cargos');
+        if (!el) return;
+        const pode = podeModificar('podeCargos');
+        if (!cargos || cargos.length === 0) {
+            el.innerHTML = '<p class="texto" style="color:#888;">Nenhum cargo registrado.</p>';
+            return;
+        }
+        el.innerHTML = cargos.map((c, i) => `
             <div class="item-cargo">
                 <div>
-                    <div class="cargo-nome" style="color:${c.cor || '#ff3385'};"><span class="badge-cor" style="background-color:${c.cor || '#ff3385'};"></span>${c.nome}</div>
+                    <div class="cargo-nome" style="color:${c.cor || '#ff3385'};">
+                        <span class="badge-cor" style="background-color:${c.cor || '#ff3385'};"></span>
+                        ${c.nome || ''}
+                    </div>
                     ${c.img ? `<img src="${c.img}" class="img-cargo-preview">` : ''}
                     <div class="cargo-tag">${c.tag || ''}</div>
                     <div class="texto" style="margin:0;">${c.desc || ''}</div>
                 </div>
-                ${podeModificar('podeCargos') ? `<div class="acao-item"><button class="btn-lapis" onclick="abrirModalEditar('cargos', ${i})">✏️</button><button class="btn-lixeira" onclick="apagarItem('cargos', ${i})">🗑️</button></div>` : ''}
+                ${pode ? `
+                    <div class="acao-item">
+                        <button class="btn-lapis" onclick="abrirModalEditar('cargos', ${i})">✏️</button>
+                        <button class="btn-lixeira" onclick="apagarItem('cargos', ${i})">🗑️</button>
+                    </div>
+                ` : ''}
             </div>
         `).join('');
-        buscar('lista-cargos').innerHTML = html || '<p class="texto" style="color:#888;">Nenhum cargo.</p>';
     }
 
     function renderizarTrofeus() {
-        const html = trofeus.map((t, i) => `
+        const el = buscar('lista-trofeus');
+        if (!el) return;
+        const pode = podeModificar('podeTrofeus');
+        if (!trofeus || trofeus.length === 0) {
+            el.innerHTML = '<p class="texto" style="color:#888;">Nenhum troféu cadastrado no momento.</p>';
+            return;
+        }
+        el.innerHTML = trofeus.map((t, i) => `
             <div class="admin-item">
-                <div><div class="admin-nome">${t.nome}</div><div class="admin-tag">${t.tag}</div><div class="texto" style="margin:0;">${t.desc}</div></div>
-                ${podeModificar('podeTrofeus') ? `<div class="acao-item"><button class="btn-lapis" onclick="abrirModalEditar('trofeus', ${i})">✏️</button><button class="btn-lixeira" onclick="apagarItem('trofeus', ${i})">🗑️</button></div>` : ''}
+                <div>
+                    <div class="admin-nome">${t.nome || ''}</div>
+                    <div class="admin-tag">${t.tag || ''}</div>
+                    <div class="texto" style="margin:0;">${t.desc || ''}</div>
+                </div>
+                ${pode ? `
+                    <div class="acao-item">
+                        <button class="btn-lapis" onclick="abrirModalEditar('trofeus', ${i})">✏️</button>
+                        <button class="btn-lixeira" onclick="apagarItem('trofeus', ${i})">🗑️</button>
+                    </div>
+                ` : ''}
             </div>
         `).join('');
-        buscar('lista-trofeus').innerHTML = html || '';
     }
 
     function renderizarBanidos() {
-        const html = banidos.map((b, i) => `
+        const el = buscar('lista-banidos');
+        if (!el) return;
+        const pode = ehConfiavelOuDono(usuarioAtual);
+        if (!banidos || banidos.length === 0) {
+            el.innerHTML = '<p class="texto" style="color:#888;">Nenhum usuário banido registrado.</p>';
+            return;
+        }
+        el.innerHTML = banidos.map((b, i) => `
             <div class="admin-item">
-                <div><div class="admin-nome" style="color:#ff3385;">${b.nome}</div><div class="admin-tag">Discord: ${b.tag}</div><div class="texto" style="margin:0;"><strong style="color:#aaa;">Motivo:</strong> ${b.desc}</div></div>
-                ${ehConfiavelOuDono(usuarioAtual) ? `<div class="acao-item"><button class="btn-lapis" onclick="abrirModalEditar('banimento', ${i})">✏️</button><button class="btn-lixeira" onclick="apagarItem('banimento', ${i})">🗑️</button></div>` : ''}
+                <div>
+                    <div class="admin-nome" style="color:#ff3385;">${b.nome || ''}</div>
+                    <div class="admin-tag">Discord: ${b.tag || ''}</div>
+                    <div class="texto" style="margin:0;"><strong style="color:#aaa;">Motivo:</strong> ${b.desc || ''}</div>
+                </div>
+                ${pode ? `
+                    <div class="acao-item">
+                        <button class="btn-lapis" onclick="abrirModalEditar('banimento', ${i})">✏️</button>
+                        <button class="btn-lixeira" onclick="apagarItem('banimento', ${i})">🗑️</button>
+                    </div>
+                ` : ''}
             </div>
         `).join('');
-        buscar('lista-banidos').innerHTML = html || '<p class="texto" style="color:#888;">Nenhum banimento.</p>';
     }
 
+    window.fazerUploadMidia = function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async function (evt) {
+            midiasArmazenadas.push({
+                tipo: file.type.startsWith('video') ? 'video' : 'imagem',
+                src: evt.target.result,
+                nome: file.name
+            });
+            await salvarTudoNuvem();
+            renderizarArmazenamento();
+        };
+        reader.readAsDataURL(file);
+    };
+
     function renderizarArmazenamento() {
-        const html = midiasArmazenadas.map((m, i) => `
+        const el = buscar('gradeMidias');
+        if (!el) return;
+        if (!midiasArmazenadas || midiasArmazenadas.length === 0) {
+            el.innerHTML = '<p class="texto" style="color:#888; grid-column: 1/-1;">Nenhuma mídia armazenada no momento.</p>';
+            return;
+        }
+        const eDono = usuarioAtual && ehDono(usuarioAtual);
+        el.innerHTML = midiasArmazenadas.map((m, i) => `
             <div class="card-midia">
-                ${ehDono(usuarioAtual) ? `<button class="btn-excluir-midia" onclick="excluirMidia(${i})">✕</button>` : ''}
+                ${eDono ? `<button class="btn-excluir-midia" onclick="excluirMidia(${i})">✕</button>` : ''}
                 ${m.tipo === 'video' ? `<video src="${m.src}" controls></video>` : `<img src="${m.src}">`}
             </div>
         `).join('');
-        buscar('gradeMidias').innerHTML = html || '';
     }
+
+    window.excluirMidia = function(idx) {
+        window.exibirAvisoCustomizado("Deseja apagar esta mídia do armazenamento?", true, async function() {
+            midiasArmazenadas.splice(idx, 1);
+            await salvarTudoNuvem();
+            renderizarArmazenamento();
+        });
+    };
 
     window.alternarAbaRanking = function(aba) {
         abaRanking = aba;
-        buscar('abaChamada').classList.toggle('ativo', aba === 'chamada');
-        buscar('abaMsgs').classList.toggle('ativo', aba === 'mensagens');
+        if (buscar('abaChamada')) buscar('abaChamada').classList.toggle('ativo', aba === 'chamada');
+        if (buscar('abaMsgs')) buscar('abaMsgs').classList.toggle('ativo', aba === 'mensagens');
         renderizarRanking();
     };
 
     function renderizarRanking() {
+        const el = buscar('conteudoRanking');
+        if (!el) return;
+        const pode = podeModificar('podeRanking');
         const lista = (abaRanking === 'chamada') ? rkChamada : rkMsgs;
-        const html = lista.map((r, i) => `
+
+        if (!lista || lista.length === 0) {
+            el.innerHTML = '<p class="texto" style="color:#888;">Nenhum registro no ranking.</p>';
+            return;
+        }
+
+        el.innerHTML = lista.map((r, i) => `
             <div class="item-ranking">
-                <div style="display:flex; align-items:center; gap:10px;"><div class="posicao">${i + 1}º</div><div><div class="ranking-nome">${r.nome}</div><div class="ranking-tag">${r.tag}</div><div class="ranking-info">${r.valor}</div></div></div>
-                ${podeModificar('podeRanking') ? `<div class="acao-item"><button class="btn-lapis" onclick="abrirModalEditar('rk_${abaRanking}', ${i})">✏️</button><button class="btn-lixeira" onclick="apagarItem('rk_${abaRanking}', ${i})">🗑️</button></div>` : ''}
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div class="posicao">${i + 1}º</div>
+                    <div>
+                        <div class="ranking-nome">${r.nome || ''}</div>
+                        <div class="ranking-tag">${r.tag || ''}</div>
+                        <div class="ranking-info">${r.valor || ''}</div>
+                    </div>
+                </div>
+                ${pode ? `
+                    <div class="acao-item">
+                        <button class="btn-lapis" onclick="abrirModalEditar('rk_${abaRanking}', ${i})">✏️</button>
+                        <button class="btn-lixeira" onclick="apagarItem('rk_${abaRanking}', ${i})">🗑️</button>
+                    </div>
+                ` : ''}
             </div>
         `).join('');
-        buscar('conteudoRanking').innerHTML = html || '';
     }
 
     function renderizarAcessos() {
-        const html = Object.keys(acessos).map(usr => `
+        const el = buscar('lista-acessos');
+        if (!el) return;
+        const pode = podeModificar('podeAcessos');
+
+        el.innerHTML = Object.keys(acessos).map(usr => {
+            const eProtegido = (usr === DONO_PROTEGIDO);
+            return `
             <div class="admin-item">
-                <div><div class="admin-nome">${usr} ${acessos[usr].eConfiavel ? '<span style="font-size:12px; color:#ff3385;">[⭐]</span>' : ''}</div><div class="admin-tag">Senha: ${acessos[usr].senha}</div></div>
-                ${podeModificar('podeAcessos') ? `<div class="acao-item"><button class="btn-lapis" onclick="abrirModalEditarAcesso('${usr}')">✏️</button>${usr !== DONO_PROTEGIDO ? `<button class="btn-lixeira" onclick="apagarAcesso('${usr}')">🗑️</button>` : ''}</div>` : ''}
+                <div>
+                    <div class="admin-nome">
+                        ${usr} ${acessos[usr].eConfiavel ? '<span style="font-size:12px; color:#ff3385;">[⭐ Confiável]</span>' : ''}
+                    </div>
+                    <div class="admin-tag">Senha: ${acessos[usr].senha}</div>
+                </div>
+                ${pode ? `
+                    <div class="acao-item">
+                        <button class="btn-lapis" onclick="abrirModalEditarAcesso('${usr}')">✏️</button>
+                        ${!eProtegido ? `<button class="btn-lixeira" onclick="apagarAcesso('${usr}')">🗑️</button>` : ''}
+                    </div>
+                ` : ''}
             </div>
-        `).join('');
-        buscar('lista-acessos').innerHTML = html || '';
+            `;
+        }).join('');
     }
 
-    // MODAL FUNÇÕES
-    window.fecharModal = () => { buscar('fundoModal').style.display = 'none'; buscar('modalForm').style.display = 'none'; };
-    
     function limparModal() {
-        buscar('camposPadrao').style.display = 'block'; buscar('camposAcessos').style.display = 'none';
-        buscar('boxCorCargo').style.display = 'none'; buscar('inpNome').disabled = false;
-        buscar('inpNome').value = ''; buscar('inpTag').value = ''; buscar('inpDesc').value = ''; buscar('inpImgCargoLink').value = '';
+        if (buscar('camposPadrao')) buscar('camposPadrao').style.display = 'block';
+        if (buscar('camposAcessos')) buscar('camposAcessos').style.display = 'none';
+        if (buscar('boxCorCargo')) buscar('boxCorCargo').style.display = 'none';
+        if (buscar('inpNome')) { buscar('inpNome').style.display = 'block'; buscar('inpNome').disabled = false; buscar('inpNome').value = ''; buscar('inpNome').placeholder = 'Nome'; }
+        if (buscar('inpTag')) { buscar('inpTag').style.display = 'block'; buscar('inpTag').value = ''; buscar('inpTag').placeholder = 'Tag'; }
+        if (buscar('inpDesc')) { buscar('inpDesc').style.display = 'block'; buscar('inpDesc').value = ''; buscar('inpDesc').placeholder = 'Descrição / Valor'; }
+        if (buscar('inpImgCargoLink')) buscar('inpImgCargoLink').value = '';
+        if (buscar('chkConfiavel')) buscar('chkConfiavel').checked = false;
+        if (buscar('chkAcessos')) buscar('chkAcessos').checked = false;
+        alternarModeradorConfiavel(false);
     }
+
+    function exibirModal() {
+        if (buscar('fundoModal')) buscar('fundoModal').style.display = 'block';
+        if (buscar('modalForm')) buscar('modalForm').style.display = 'block';
+    }
+
+    window.fecharModal = function() {
+        if (buscar('fundoModal')) buscar('fundoModal').style.display = 'none';
+        if (buscar('modalForm')) buscar('modalForm').style.display = 'none';
+    };
 
     window.abrirModalNovo = function(tipo) {
-        limparModal(); buscar('modalCtx').value = tipo + '_novo';
-        if(tipo === 'cargos') buscar('boxCorCargo').style.display = 'block';
-        buscar('fundoModal').style.display = 'block'; buscar('modalForm').style.display = 'block';
+        limparModal();
+        if (buscar('modalTitulo')) buscar('modalTitulo').innerText = 'Adicionar Item';
+        if (buscar('modalCtx')) buscar('modalCtx').value = tipo + '_novo';
+        
+        if (tipo === 'banimento') {
+            if (buscar('inpNome')) buscar('inpNome').placeholder = 'Nome da pessoa';
+            if (buscar('inpTag')) buscar('inpTag').placeholder = 'Nome exato no Discord';
+            if (buscar('inpDesc')) buscar('inpDesc').placeholder = 'Motivo do banimento';
+        } else if (tipo === 'cargos') {
+            if (buscar('boxCorCargo')) buscar('boxCorCargo').style.display = 'block';
+        }
+        exibirModal();
     };
 
     window.abrirModalNovoRanking = function() {
-        limparModal(); buscar('modalCtx').value = 'rk_novo';
-        buscar('fundoModal').style.display = 'block'; buscar('modalForm').style.display = 'block';
+        limparModal();
+        if (buscar('modalTitulo')) buscar('modalTitulo').innerText = 'Adicionar Posição';
+        if (buscar('modalCtx')) buscar('modalCtx').value = 'rk_novo';
+        exibirModal();
     };
 
     window.abrirModalEditar = function(tipo, idx) {
-        limparModal(); buscar('modalCtx').value = tipo + '_edit'; buscar('modalIndex').value = idx;
-        let item = (tipo==='trofeus')?trofeus[idx] : (tipo==='cargos')?cargos[idx] : (tipo==='banimento')?banidos[idx] : (tipo==='rk_chamada')?rkChamada[idx] : rkMsgs[idx];
-        buscar('inpNome').value = item.nome || ''; buscar('inpTag').value = item.tag || ''; buscar('inpDesc').value = item.desc || item.valor || '';
-        if(tipo==='cargos') { buscar('boxCorCargo').style.display='block'; buscar('inpCorCargo').value=item.cor||'#ff3385'; buscar('inpImgCargoLink').value=item.img||''; }
-        buscar('fundoModal').style.display = 'block'; buscar('modalForm').style.display = 'block';
+        limparModal();
+        let item;
+        if (tipo === 'trofeus') item = trofeus[idx];
+        else if (tipo === 'cargos') item = cargos[idx];
+        else if (tipo === 'banimento') item = banidos[idx];
+        else if (tipo === 'rk_chamada') item = rkChamada[idx];
+        else if (tipo === 'rk_mensagens') item = rkMsgs[idx];
+        if (!item) return;
+
+        if (buscar('modalTitulo')) buscar('modalTitulo').innerText = 'Editar Item';
+        if (buscar('modalCtx')) buscar('modalCtx').value = tipo + '_edit';
+        if (buscar('modalIndex')) buscar('modalIndex').value = idx;
+
+        if (buscar('inpNome')) buscar('inpNome').value = item.nome || '';
+        if (buscar('inpTag')) buscar('inpTag').value = item.tag || '';
+        if (buscar('inpDesc')) buscar('inpDesc').value = item.desc || item.valor || '';
+
+        if (tipo === 'banimento') {
+            if (buscar('inpNome')) buscar('inpNome').placeholder = 'Nome da pessoa';
+            if (buscar('inpTag')) buscar('inpTag').placeholder = 'Nome exato no Discord';
+            if (buscar('inpDesc')) buscar('inpDesc').placeholder = 'Motivo do banimento';
+        } else if (tipo === 'cargos') {
+            if (buscar('boxCorCargo')) buscar('boxCorCargo').style.display = 'block';
+            if (buscar('inpCorCargo')) buscar('inpCorCargo').value = item.cor || '#ff3385';
+            if (buscar('inpImgCargoLink')) buscar('inpImgCargoLink').value = item.img || '';
+        }
+        exibirModal();
     };
 
     window.abrirModalNovoAcesso = function() {
-        limparModal(); buscar('modalCtx').value = 'acesso_novo'; buscar('camposAcessos').style.display = 'block';
-        buscar('fundoModal').style.display = 'block'; buscar('modalForm').style.display = 'block';
+        limparModal();
+        if (buscar('modalTitulo')) buscar('modalTitulo').innerText = 'Cadastrar Acesso';
+        if (buscar('modalCtx')) buscar('modalCtx').value = 'acesso_novo';
+        if (buscar('inpTag')) buscar('inpTag').style.display = 'none';
+        if (buscar('inpDesc')) buscar('inpDesc').style.display = 'none';
+        if (buscar('camposAcessos')) buscar('camposAcessos').style.display = 'block';
+        exibirModal();
     };
 
     window.abrirModalEditarAcesso = function(usr) {
-        limparModal(); buscar('modalCtx').value = 'acesso_edit'; buscar('modalIndex').value = usr;
-        buscar('camposAcessos').style.display = 'block'; buscar('inpNome').value = usr; buscar('inpSenhaAcesso').value = acessos[usr].senha;
-        if(usr === DONO_PROTEGIDO) buscar('inpNome').disabled = true;
-        buscar('fundoModal').style.display = 'block'; buscar('modalForm').style.display = 'block';
+        limparModal();
+        const a = acessos[usr];
+        if (!a) return;
+
+        if (buscar('modalTitulo')) buscar('modalTitulo').innerText = 'Editar Acesso: ' + usr;
+        if (buscar('modalCtx')) buscar('modalCtx').value = 'acesso_edit';
+        if (buscar('modalIndex')) buscar('modalIndex').value = usr;
+
+        if (buscar('inpTag')) buscar('inpTag').style.display = 'none';
+        if (buscar('inpDesc')) buscar('inpDesc').style.display = 'none';
+        if (buscar('camposAcessos')) buscar('camposAcessos').style.display = 'block';
+
+        if (buscar('inpNome')) {
+            buscar('inpNome').value = usr;
+            if (usr === DONO_PROTEGIDO) buscar('inpNome').disabled = true;
+        }
+        if (buscar('inpSenhaAcesso')) buscar('inpSenhaAcesso').value = a.senha;
+
+        const confiavel = !!a.eConfiavel;
+        if (buscar('chkConfiavel')) buscar('chkConfiavel').checked = confiavel;
+        if (buscar('chkAcessos')) buscar('chkAcessos').checked = !!a.podeAcessos;
+        alternarModeradorConfiavel(confiavel);
+
+        if (!confiavel) {
+            if (buscar('chkCargos')) buscar('chkCargos').checked = a.podeCargos;
+            if (buscar('chkTrofeus')) buscar('chkTrofeus').checked = a.podeTrofeus;
+            if (buscar('chkAdms')) buscar('chkAdms').checked = a.podeAdms;
+            if (buscar('chkRanking')) buscar('chkRanking').checked = a.podeRanking;
+        }
+
+        if (usr === DONO_PROTEGIDO) {
+            if (buscar('chkConfiavel')) { buscar('chkConfiavel').checked = true; buscar('chkConfiavel').disabled = true; }
+            if (buscar('chkAcessos')) { buscar('chkAcessos').checked = true; buscar('chkAcessos').disabled = true; }
+            alternarModeradorConfiavel(true);
+        }
+        exibirModal();
     };
 
-    // MAGIA AQUI: Atualização Otimista
-    window.salvarFormularioModal = function(e) {
-        e.preventDefault(); 
-        const ctx = buscar('modalCtx').value; const idx = buscar('modalIndex').value;
-        const nm = buscar('inpNome').value; const tg = buscar('inpTag').value; const dc = buscar('inpDesc').value;
+    window.salvarFormularioModal = async function(e) {
+        e.preventDefault();
+        const ctx = buscar('modalCtx') ? buscar('modalCtx').value : '';
+        const idx = buscar('modalIndex') ? buscar('modalIndex').value : '';
+
+        const nm = buscar('inpNome') ? buscar('inpNome').value.trim() : '';
+        const tg = buscar('inpTag') ? buscar('inpTag').value.trim() : '';
+        const dc = buscar('inpDesc') ? buscar('inpDesc').value.trim() : '';
+        const cor = buscar('inpCorCargo') ? buscar('inpCorCargo').value : '#ff3385';
+        const imgLink = buscar('inpImgCargoLink') ? buscar('inpImgCargoLink').value.trim() : '';
 
         if (ctx === 'trofeus_novo') trofeus.push({ nome: nm, tag: tg, desc: dc });
         else if (ctx === 'trofeus_edit') trofeus[idx] = { nome: nm, tag: tg, desc: dc };
-        else if (ctx === 'cargos_novo') cargos.push({ nome: nm, tag: tg, cor: buscar('inpCorCargo').value, img: buscar('inpImgCargoLink').value, desc: dc });
-        else if (ctx === 'cargos_edit') cargos[idx] = { nome: nm, tag: tg, cor: buscar('inpCorCargo').value, img: buscar('inpImgCargoLink').value, desc: dc };
+        else if (ctx === 'cargos_novo') cargos.push({ nome: nm, tag: tg, cor: cor, img: imgLink, desc: dc });
+        else if (ctx === 'cargos_edit') cargos[idx] = { nome: nm, tag: tg, cor: cor, img: imgLink, desc: dc };
         else if (ctx === 'banimento_novo') banidos.push({ nome: nm, tag: tg, desc: dc });
         else if (ctx === 'banimento_edit') banidos[idx] = { nome: nm, tag: tg, desc: dc };
-        else if (ctx === 'rk_novo') { abaRanking === 'chamada' ? rkChamada.push({nome:nm, tag:tg, valor:dc}) : rkMsgs.push({nome:nm, tag:tg, valor:dc}); }
-        else if (ctx === 'rk_chamada_edit') rkChamada[idx] = { nome: nm, tag: tg, valor: dc };
+        else if (ctx === 'rk_novo') {
+            const item = { nome: nm, tag: tg, valor: dc };
+            if (abaRanking === 'chamada') rkChamada.push(item);
+            else rkMsgs.push(item);
+        } else if (ctx === 'rk_chamada_edit') rkChamada[idx] = { nome: nm, tag: tg, valor: dc };
         else if (ctx === 'rk_mensagens_edit') rkMsgs[idx] = { nome: nm, tag: tg, valor: dc };
-        else if (ctx.includes('acesso')) {
-            if (ctx === 'acesso_edit' && idx !== nm) delete acessos[idx];
-            acessos[nm] = { senha: buscar('inpSenhaAcesso').value, eConfiavel: buscar('chkConfiavel').checked };
+        else if (ctx === 'acesso_novo' || ctx === 'acesso_edit') {
+            const pwd = buscar('inpSenhaAcesso') ? buscar('inpSenhaAcesso').value.trim() : '';
+            const eConf = buscar('chkConfiavel') ? buscar('chkConfiavel').checked : false;
+            const pAcessos = buscar('chkAcessos') ? buscar('chkAcessos').checked : false;
+
+            const obj = {
+                senha: pwd,
+                eConfiavel: eConf,
+                podeAcessos: pAcessos,
+                podeCargos: eConf || (buscar('chkCargos') ? buscar('chkCargos').checked : false),
+                podeTrofeus: eConf || (buscar('chkTrofeus') ? buscar('chkTrofeus').checked : false),
+                podeAdms: eConf || (buscar('chkAdms') ? buscar('chkAdms').checked : false),
+                podeRanking: eConf || (buscar('chkRanking') ? buscar('chkRanking').checked : false)
+            };
+
+            if (idx === DONO_PROTEGIDO || nm === DONO_PROTEGIDO) {
+                acessos[DONO_PROTEGIDO] = { ...obj, eConfiavel: true, podeAcessos: true, podeCargos: true, podeTrofeus: true, podeAdms: true, podeRanking: true };
+            } else {
+                if (ctx === 'acesso_edit' && idx !== nm) delete acessos[idx];
+                acessos[nm] = obj;
+            }
         }
 
         window.fecharModal();
-        
-        // Atualiza a tela NA HORA, sem esperar a internet
+
+        const salvo = await salvarTudoNuvem();
+        if (!salvo) {
+            window.exibirAvisoCustomizado("⚠️ Erro ao salvar na nuvem do Firebase, verifique sua conexão.");
+        }
+
         atualizarInterface();
-        
-        // Salva na nuvem no fundo (se a net cair, o backup local segura)
-        salvarTudoNuvem(); 
     };
 
     window.apagarItem = function(tipo, idx) {
-        window.exibirAvisoCustomizado("Tem certeza que deseja apagar?", true, function() {
-            if(tipo==='trofeus') trofeus.splice(idx,1); else if(tipo==='cargos') cargos.splice(idx,1); else if(tipo==='banimento') banidos.splice(idx,1); else if(tipo==='rk_chamada') rkChamada.splice(idx,1); else if(tipo==='rk_mensagens') rkMsgs.splice(idx,1);
-            atualizarInterface(); salvarTudoNuvem();
+        window.exibirAvisoCustomizado("Tem certeza que deseja apagar? Esta ação é irreversível.", true, async function() {
+            if (tipo === 'trofeus') trofeus.splice(idx, 1);
+            else if (tipo === 'cargos') cargos.splice(idx, 1);
+            else if (tipo === 'banimento') banidos.splice(idx, 1);
+            else if (tipo === 'rk_chamada') rkChamada.splice(idx, 1);
+            else if (tipo === 'rk_mensagens') rkMsgs.splice(idx, 1);
+            await salvarTudoNuvem();
+            atualizarInterface();
         });
     };
 
     window.apagarAcesso = function(usr) {
-        window.exibirAvisoCustomizado("Apagar este acesso?", true, function() {
-            delete acessos[usr]; atualizarInterface(); salvarTudoNuvem();
-        });
-    };
-
-    window.excluirMidia = function(idx) {
-        window.exibirAvisoCustomizado("Apagar esta mídia?", true, function() {
-            midiasArmazenadas.splice(idx, 1); atualizarInterface(); salvarTudoNuvem();
+        if (usr === DONO_PROTEGIDO) {
+            window.exibirAvisoCustomizado("❌ A conta do dono (fcw.) não pode ser excluída!");
+            return;
+        }
+        window.exibirAvisoCustomizado("Tem certeza que deseja apagar este acesso?", true, async function() {
+            delete acessos[usr];
+            await salvarTudoNuvem();
+            atualizarInterface();
         });
     };
 
