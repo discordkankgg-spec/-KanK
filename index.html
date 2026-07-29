@@ -153,6 +153,7 @@
     <nav class="menu" id="menuPrincipal">
         <a onclick="irParaPagina('inicio')">Início</a>
         <a onclick="irParaPagina('tiktok')">TikToks do servidor</a>
+        <a onclick="irParaPagina('instagram')">Instagram</a>
         <a onclick="irParaPagina('trofeus')">Troféus</a>
         <a onclick="irParaPagina('ranking')">Ranking Ativo</a>
         <a onclick="irParaPagina('login')">Alta Elite</a>
@@ -180,6 +181,14 @@
         <div style="display:flex; flex-direction:column; gap:10px; margin-top:20px;">
             <a href="https://www.tiktok.com/@kankdc?_r=1&_t=ZS-98JMMgwgFgQ" target="_blank" class="botao" style="text-align:center;">! KanK</a>
             <a href="https://www.tiktok.com/@pequenosgarotinhos?_r=1&_t=ZS-98JMNXF7gfa" target="_blank" class="botao" style="text-align:center;">2pe e True</a>
+        </div>
+    </div>
+
+    <!-- INSTAGRAM -->
+    <div id="pag-instagram" class="pagina">
+        <h1 class="titulo">Instagram do servidor</h1>
+        <div style="display:flex; flex-direction:column; gap:10px; margin-top:20px;">
+            <a href="https://www.instagram.com/discordkank?igsh=d243dDMzeW9tOHJk" target="_blank" class="botao" style="text-align:center;">! KanK</a>
         </div>
     </div>
 
@@ -328,7 +337,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // DONOS COM ACESSO TOTAL
     const DONOS = ["fcw.", "ruminancia"];
 
     let acessosPadrao = { 
@@ -350,7 +358,6 @@
     let usuarioAtual = localStorage.getItem('kank_usuario_atual') || null; 
     let abaRanking = 'chamada';
 
-    // SALVAMENTO PERMANENTE
     function salvarLocalmente() {
         localStorage.setItem('kank_dados', JSON.stringify({acessos, trofeus, cargos, rkChamada, rkMsgs, banidos, midias: midiasArmazenadas}));
     }
@@ -358,7 +365,6 @@
         salvarLocalmente();
         try { await setDoc(doc(db, "kank_dados", "dados_principais"), {acessos, trofeus, cargos, rkChamada, rkMsgs, banidos, midias: midiasArmazenadas}); }
         catch(e){}
-        
         renderizarTudo();
     }
     async function carregarDados() {
@@ -497,10 +503,11 @@
         `).join('')||'<p class="texto" style="color:#888;">Nenhum banimento.</p>';
 
         const lista = abaRanking==='chamada'?rkChamada:rkMsgs;
+        const prefixoRk = abaRanking==='chamada'?'rk_chamada':'rk_mensagens';
         buscar('conteudoRanking').innerHTML = lista.map((r,i)=>`
             <div class="item-ranking">
                 <div style="display:flex;gap:10px;align-items:center;"><div class="posicao">${i+1}º</div><div><div class="ranking-nome">${r.nome}</div><div class="ranking-tag">${r.tag}</div><div class="ranking-info">${r.valor}</div></div></div>
-                ${podeModificar('podeRanking')?`<div class="acao-item"><button class="btn-lapis" onclick="abrirEditar('rk_'+abaRanking,${i})">✏️</button><button class="btn-lixeira" onclick="apagarItem('rk_'+abaRanking,${i})">🗑️</button></div>`:''}
+                ${podeModificar('podeRanking')?`<div class="acao-item"><button class="btn-lapis" onclick="abrirEditar('${prefixoRk}',${i})">✏️</button><button class="btn-lixeira" onclick="apagarItem('${prefixoRk}',${i})">🗑️</button></div>`:''}
             </div>
         `).join('')||'<p class="texto" style="color:#888;">Ranking vazio.</p>';
 
@@ -578,7 +585,8 @@
         else if(ctx==='banimento_novo') banidos.push({nome:n,tag:t,desc:d});
         else if(ctx==='banimento_edit') banidos[idx]={nome:n,tag:t,desc:d};
         else if(ctx==='rk_novo') (abaRanking==='chamada'?rkChamada:rkMsgs).push({nome:n,tag:t,valor:d});
-        else if(ctx.startsWith('rk_')) (ctx==='rk_chamada_edit'?rkChamada:rkMsgs)[idx]={nome:n,tag:t,valor:d};
+        else if(ctx==='rk_chamada_edit') rkChamada[idx]={nome:n,tag:t,valor:d};
+        else if(ctx==='rk_mensagens_edit') rkMsgs[idx]={nome:n,tag:t,valor:d};
         else if(ctx.includes('acesso')) {
             if(!ehDono(usuarioAtual)&&!podeModificar('podeAcessos')) return;
             if(ctx==='acesso_edit'&&idx!==n) delete acessos[idx];
@@ -602,7 +610,8 @@
             if(t==='trofeus') trofeus.splice(i,1);
             else if(t==='cargos') cargos.splice(i,1);
             else if(t==='banimento') banidos.splice(i,1);
-            else if(t.startsWith('rk_')) (t==='rk_chamada'?rkChamada:rkMsgs).splice(i,1);
+            else if(t==='rk_chamada') rkChamada.splice(i,1);
+            else if(t==='rk_mensagens') rkMsgs.splice(i,1);
             salvarTudoNuvem();
         });
     };
